@@ -11,3 +11,7 @@ eslintrc.js
 README.md 
 
 dist
+
+
+.DS_Store
+/src/.DS_Store

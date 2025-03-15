@@ -11,9 +11,9 @@ import { PaymentModule } from './payment/payment.module';
 import { BookingModule } from './booking/booking.module';
 import { CarModule } from './car/car.module';
 import { UsersModule } from './users/users.module';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { StatsModule } from './stats/stats.module';
-import typeorm from './config/typeorm';
+import { MailerModule } from './mailer/mailer.module';
+import databaseConfig from './config/typeorm';
 
 @Module({
   imports: [
@@ -22,21 +22,10 @@ import typeorm from './config/typeorm';
       useFactory: async (configService: ConfigService) =>
         configService.get('typeorm'),
     }),
-    MailerModule.forRoot({
-      transport: "smtp://'':''@mailtutan",
-      defaults: {
-        from: '"Run.go" <admin@run.go>',
-        host: 'mailtutan',
-        port: 1025,
-        auth: {
-          user: '',
-          pass: '',
-        },
-      },
-    }),
+
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [typeorm],
+      load: [databaseConfig],
     }),
     ThrottlerModule.forRoot([
       {
@@ -52,6 +41,7 @@ import typeorm from './config/typeorm';
     BookingModule,
     CarModule,
     StatsModule,
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

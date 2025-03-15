@@ -22,6 +22,11 @@ import { SetNewPasswordDTO } from '../dto/setNewPassword';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admin } from '../../entities/admin.entity';
+import {
+  EmailOptions,
+  EmailTemplate,
+  MailerService,
+} from 'src/mailer/mailer.service';
 @Injectable()
 export class AdminAuthService {
   constructor(
@@ -31,6 +36,8 @@ export class AdminAuthService {
     private readonly adminService: AdminService,
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
+    @Inject(MailerService)
+    private readonly mailerService: MailerService,
   ) {}
 
   private readonly logger = new Logger(AdminAuthService.name);
@@ -41,7 +48,7 @@ export class AdminAuthService {
       const admin = await this.adminService.findOneByEmail(email);
       if (admin !== null) {
         throw new ConflictException(
-          'an admin with the provided email already exists ',
+          'An admin with the provided email already exists',
         );
       }
     } catch (error) {
@@ -76,7 +83,15 @@ export class AdminAuthService {
         'The request could not be completed',
       );
     });
-
+    const emailOptions: EmailOptions = {
+      recipient: {
+        name: payload.firstName,
+        emailAddress: payload.email,
+      },
+      subject: 'Welcome to Run go',
+      template: EmailTemplate.Signup,
+    };
+    await this.mailerService.sendEmail(emailOptions);
     return new ApiResponse('Admin account successfully created', null);
   }
 
@@ -121,9 +136,19 @@ export class AdminAuthService {
     try {
       const admin = await this.adminService.findOneByEmail(request.email);
       if (!admin) {
-        throw new NotFoundException('Invalid email');
+        return new UnprocessableEntityException(
+          'An email would be sent to you if and account with the provided email exists',
+        );
       }
-      //TODO: send email
+      const emailOptions: EmailOptions = {
+        recipient: {
+          name: admin.firstName,
+          emailAddress: admin.email,
+        },
+        subject: 'Password reset',
+        template: EmailTemplate.Forgottenpassword,
+      };
+      await this.mailerService.sendEmail(emailOptions);
     } catch (error) {
       if (error.status == HttpStatus.NOT_FOUND) {
         throw new NotFoundException(error.message);

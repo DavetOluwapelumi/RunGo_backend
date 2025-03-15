@@ -8,6 +8,7 @@ import { AdminService } from './services/admin.service';
 import { AdminAuthService } from './services/admin.auth.service';
 import { AdminProfileService } from './services/admin.profile.service';
 import { AdminProfileController } from './controllers/admin.profile.controller';
+import { MailerService } from 'src/mailer/mailer.service';
 
 @Module({
   providers: [
@@ -15,6 +16,7 @@ import { AdminProfileController } from './controllers/admin.profile.controller';
     CommonAuthService,
     AdminAuthService,
     AdminProfileService,
+    MailerService,
   ],
   imports: [TypeOrmModule.forFeature([Admin])],
   controllers: [AdminController, AdminAuthController, AdminProfileController],
