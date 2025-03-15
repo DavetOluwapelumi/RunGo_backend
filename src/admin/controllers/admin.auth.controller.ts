@@ -44,5 +44,4 @@ export class AdminAuthController {
   ) {
     return this.adminAuthService.setNewPassword(request, authorizedUser);
   }
-
 }
