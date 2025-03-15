@@ -7,8 +7,6 @@ COPY  . .
 
 RUN npm install 
 
-RUN npm i @css-inline/css-inline-linux-arm64-musl
-
 EXPOSE 5000
 
 
