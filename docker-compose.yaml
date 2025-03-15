@@ -54,15 +54,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-
-  mailtutan:
-    image: mailtutan/mailtutan:latest
-    restart: always
-    ports:
-      - 1080:1080
-      - 1025:1025
-    # command: [ "mailtutan", "--smtp-auth-username=hera", " --smtp-auth-password=hera" ]
-
 volumes:
   postgres-data:
   pgadmin-data:

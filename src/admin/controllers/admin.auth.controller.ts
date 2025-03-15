@@ -2,6 +2,7 @@ import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
 import { AdminAuthService } from '../services/admin.auth.service';
 import { CreateAdminDTO } from 'src/admin/dto/createAdmin';
 import { LoginAdminDTO } from '../dto/loginAdmin';
+import { RequestPasswordResetDTO } from '../dto/requestPasswordReset';
 
 @Controller({ version: '1', path: 'admin/auth' })
 export class AdminAuthController {
@@ -16,9 +17,13 @@ export class AdminAuthController {
     return this.adminAuthService.register(request);
   }
 
-  @HttpCode(200)
   @Post('login')
   async loginAdminUser(@Body() request: LoginAdminDTO) {
     return this.adminAuthService.login(request);
+  }
+
+  @Post('reset-password')
+  async adminPasswordReset(@Body() request: RequestPasswordResetDTO) {
+    return this.adminAuthService.requestPasswordReset(request);
   }
 }

@@ -121,7 +121,9 @@ export class AdminAuthService {
     try {
       const admin = await this.adminService.findOneByEmail(request.email);
       if (!admin) {
-        throw new NotFoundException('Invalid email');
+        return new UnprocessableEntityException(
+          'An email would be sent to you if and account with the provided email exists',
+        );
       }
       //TODO: send email
     } catch (error) {

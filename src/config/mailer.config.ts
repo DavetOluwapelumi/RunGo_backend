@@ -1,24 +1,19 @@
 import { MailerOptions } from '@nestjs-modules/mailer';
-import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
-import { config } from 'dotenv';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { registerAs } from '@nestjs/config';
 
 export const mailerConfig: MailerOptions = {
-  transport: "smtp://'':''@mailtutan",
+  transport: process.env.SMTP_TRANSPORT,
   defaults: {
     from: '"Run.go" <admin@run.go>',
-    host: 'mailtutan',
-    port: 1025,
-    auth: {
-      user: '',
-      pass: '',
-    },
   },
   template: {
     dir: __dirname + '/templates',
-    adapter: new EjsAdapter(),
+    // adapter: new HandlebarsAdapter(),
     options: {
       strict: true,
     },
   },
 };
-config();
+
+export default registerAs('mailer', () => mailerConfig);
