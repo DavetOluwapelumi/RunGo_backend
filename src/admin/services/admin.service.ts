@@ -6,6 +6,9 @@ import { CreateAdminDTO } from '../dto/createAdmin';
 
 @Injectable()
 export class AdminService {
+  activateAccount(email: string) {
+    throw new Error('Method not implemented.');
+  }
   @InjectRepository(Admin)
   private readonly adminRepository: Repository<Admin>;
 

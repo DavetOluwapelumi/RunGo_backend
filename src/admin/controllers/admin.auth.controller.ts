@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Inject,
   Post,
   Put,
+  Query,
   Request,
 } from '@nestjs/common';
 import { AdminAuthService } from '../services/admin.auth.service';
@@ -25,6 +27,12 @@ export class AdminAuthController {
   @Post('register')
   async createAdminUser(@Body() request: CreateAdminDTO) {
     return this.adminAuthService.register(request);
+  }
+
+  @HttpCode(200)
+  @Get('verify')
+  async verifyEmail(@Query('token') token: string) {
+    return this.adminAuthService.verifyHotlink(token.trim());
   }
 
   @Post('login')

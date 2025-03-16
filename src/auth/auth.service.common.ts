@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { JwtPayload } from '../interfaces/jwt';
@@ -20,13 +20,46 @@ export class CommonAuthService {
     return await argon2.verify(hash, rawPassword.trim());
   }
 
-  generateJwt(payload: JwtPayload): Promise<string> {
+  public generateJwt(payload: JwtPayload): Promise<string> {
     return this.jwtService.signAsync(payload);
   }
 
   public async generateHotlink(payload: HotlinkInterface) {
-    const serverBaseUrl = process.env.BASE_URL;
     const jwt = await this.generateJwt(payload);
-    return `${serverBaseUrl}/verify?token=${jwt}`;
+    const baseUrl = process.env.BASE_URL;
+    const path = payload.accountType.toLowerCase().trim();
+    const hotlink = `${baseUrl}/v1/${path}/auth/verify?token=${jwt}`;
+    return hotlink;
+  }
+
+  public async validateHotLink(
+    hotlinkToken: string,
+  ): Promise<{ isValid: boolean; data: HotlinkInterface }> {
+    try {
+      const data = await this.validateJwt(hotlinkToken);
+      if (!data) {
+        return {
+          isValid: false,
+          data,
+        };
+      } else
+        return {
+          isValid: true,
+          data,
+        };
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async validateJwt(token: string): Promise<JwtPayload> {
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
+      return payload;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
