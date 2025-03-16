@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { JwtPayload } from '../interfaces/jwt';
+import { HotlinkInterface } from 'src/interfaces/hotlink';
 
 @Injectable()
 export class CommonAuthService {
@@ -21,5 +22,11 @@ export class CommonAuthService {
 
   generateJwt(payload: JwtPayload): Promise<string> {
     return this.jwtService.signAsync(payload);
+  }
+
+  public async generateHotlink(payload: HotlinkInterface) {
+    const serverBaseUrl = process.env.BASE_URL;
+    const jwt = await this.generateJwt(payload);
+    return `${serverBaseUrl}/verify?token=${jwt}`;
   }
 }
