@@ -27,6 +27,7 @@ import {
   EmailTemplate,
   MailerService,
 } from 'src/mailer/mailer.service';
+import { HotlinkInterface } from 'src/interfaces/hotlink';
 @Injectable()
 export class AdminAuthService {
   constructor(
@@ -77,12 +78,22 @@ export class AdminAuthService {
       password: hashedPassword,
       email,
     };
-    await this.adminService.create(payload).catch((error) => {
+    const admin = await this.adminService.create(payload).catch((error) => {
       this.logger.error(`error hashing password due to ${error.message}`);
       throw new InternalServerErrorException(
         'The request could not be completed',
       );
     });
+
+    const hotlinkPayload: HotlinkInterface = {
+      userId: admin.identifier,
+      userEmail: admin.email,
+      accountType: 'admin',
+    };
+
+    const generatedHotlink =
+      await this.commonAuthService.generateHotlink(hotlinkPayload);
+
     const emailOptions: EmailOptions = {
       recipient: {
         name: payload.firstName,
@@ -90,7 +101,12 @@ export class AdminAuthService {
       },
       subject: 'Welcome to Run go',
       template: EmailTemplate.Signup,
+      data: {
+        name: payload.firstName,
+        hotlink: generatedHotlink,
+      },
     };
+
     await this.mailerService.sendEmail(emailOptions);
     return new ApiResponse('Admin account successfully created', null);
   }
@@ -147,6 +163,10 @@ export class AdminAuthService {
         },
         subject: 'Password reset',
         template: EmailTemplate.Forgottenpassword,
+        data: {
+          hotlink: 'http://whatever',
+          name: admin.firstName,
+        },
       };
       await this.mailerService.sendEmail(emailOptions);
     } catch (error) {
