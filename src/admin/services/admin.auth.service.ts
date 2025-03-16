@@ -211,4 +211,42 @@ export class AdminAuthService {
       }
     }
   }
+
+  public async verifyHotlink(hotlinkToken: string) {
+    try {
+      const { isValid, data } =
+        await this.commonAuthService.validateHotLink(hotlinkToken);
+      if (!isValid) {
+        throw new UnauthorizedException(
+          'it appears the link is broken please contanct support ',
+        );
+      }
+      const email = data.userEmail;
+      await this.activateAccount(email);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  private async activateAccount(email: string) {
+    try {
+      const admin = await this.adminRepository.findOneBy({ email });
+      if (!admin) {
+        throw new NotFoundException('invalid or broken email address');
+      }
+      admin.isVerified = true;
+      await this.adminRepository.save(admin);
+      //TODO; return html page
+      return new ApiResponse('account successfully verified', null);
+    } catch (error) {
+      if (error.status == HttpStatus.NOT_FOUND) {
+        throw new NotFoundException(error.message);
+      } else {
+        throw new HttpException(
+          'request could not be completed',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+    }
+  }
 }

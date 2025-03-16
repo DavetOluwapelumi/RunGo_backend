@@ -69,3 +69,5 @@ See documentation
 - [Typeorm](https://typeorm.io)
 - [NestJs](https://nestjs.com)
 - [API documentation](https://documenter.getpostman.com/view/18058225/2sAYdhHpNK)
+- [Email sandbox](https://ethereal.email), see the [.env.example](.env.example)
+  for th credentials
