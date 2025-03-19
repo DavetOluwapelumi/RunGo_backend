@@ -11,7 +11,6 @@ default:
     
 start:
     docker compose up -d  && just logs
-
 stop:
     docker compose down
     
