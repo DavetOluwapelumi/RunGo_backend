@@ -10,7 +10,7 @@ import {
     Request,
   } from '@nestjs/common';
   import { DriverAuthService } from '../services/driver.auth.service';
-  import { CreateDriverDTO } from 'src/driver/dto/createDriver';
+  import { CreateDriverDTO } from '../dto/createDriver';
   import { LoginDriverDTO } from '../dto/loginDriver';
   import { RequestPasswordResetDTO } from '../dto/requestPasswordReset';
   import { SetNewPasswordDTO } from '../dto/setNewPassword';
