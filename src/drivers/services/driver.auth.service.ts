@@ -12,16 +12,16 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { CommonAuthService } from '../../auth/auth.service.common';
-import { CreateDriverDTO } from '../dto/createDriver.dto';
-import { DriverService } from './driver.service';
+import { CreateDriverDTO } from 'src/drivers/dto/createDriver';
+import { DriverService } from './drivers.service';
 import { ApiResponse } from 'src/adapters/apiResponse';
-import { LoginDriverDTO } from '../dto/loginDriver.dto';
+import { LoginDriverDTO } from '../dto/loginDriver';
 import { JwtPayload } from 'src/interfaces/jwt';
-import { RequestPasswordResetDTO } from '../dto/requestPasswordReset.dto';
-import { SetNewPasswordDTO } from '../dto/setNewPassword.dto';
+import { RequestPasswordResetDTO } from '../dto/requestPasswordReset';
+import { SetNewPasswordDTO } from '../dto/setNewPassword';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Driver } from '../../entities/driver.entity';
+import  Driver  from '../../entities/driver.entity';
 
 @Injectable()
 export class DriverAuthService {
