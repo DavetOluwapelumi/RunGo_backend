@@ -5,6 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "^20"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -24,10 +27,8 @@
     "migration:create": "npm run typeorm -- migration:create ./src/migrations/$npm_config_name",
     "migration:revert": "npm run typeorm -- -d ./src/config/typeorm.ts migration:revert"
   },
-  "optionalDependencies": {
-    "@css-inline/css-inline-linux-arm64-musl": "0.14.1"
-  },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^10.0.0",
@@ -43,9 +44,7 @@
     "compression": "^1.7.5",
     "ejs": "^3.1.10",
     "flutterwave-node-v3": "^1.1.14",
-    "handlebars": "^4.7.8",
     "helmet": "^8.0.0",
-    "mailersend": "^2.3.0",
     "nodemailer": "^6.10.0",
     "pg": "^8.13.3",
     "reflect-metadata": "^0.2.0",
@@ -54,12 +53,10 @@
     "ulid": "^2.3.0"
   },
   "devDependencies": {
-    "@css-inline/css-inline": "^0.14.3",
-    "@nestjs/cli": "^10.4.9",
+    "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
     "@types/bcrypt": "^5.0.2",
-    "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",

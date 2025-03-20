@@ -20,9 +20,6 @@ Run.go backend on NestJs
 
 ### Dependencies
 
-To get started, ensure the following dependencies are installed on the traget
-device.
-
 - [Just](https://just.systems)
 - [NodeJs](https://nodejs.org)
 - [Docker](https://docker.com)
@@ -30,12 +27,13 @@ device.
 
 ### Installing
 
-For the application's initial setup, run the following command.
+To set up the service locally, ensure [just](https://just.systems) is install
+then execute the command
 
 ```sh
-git clone https://github.com/DavetOluwapelumi/RunGo_backend backend
-cd backend 
-cp .env.template .env
+git clone https://github.com/opeolluwa/hera
+cd hera 
+cp .env.example .env
 just start
 ```
 
@@ -51,23 +49,20 @@ just start
 
 1. Create migration
 
-```sh
-npm run migration:create --name=<migration-title>
-```
+  ```sh
+  npm run migration:create --name=<migration-title> 
+
+   ```
 
 2. Revert migration
 
-```sh
-npm run migration:revert
-```
+  ```sh
+    npm run migration:revert
+ ```
 
 ## Help
-
-See documentation
-
+See documentation 
 - [TypeORM migration guide](https://github.com/typeorm/typeorm/blob/master/docs/migrations.md)
 - [Typeorm](https://typeorm.io)
 - [NestJs](https://nestjs.com)
 - [API documentation](https://documenter.getpostman.com/view/18058225/2sAYdhHpNK)
-- [Email sandbox](https://ethereal.email), see the [.env.example](.env.example)
-  for th credentials
