@@ -22,12 +22,6 @@ import { SetNewPasswordDTO } from '../dto/setNewPassword';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admin } from '../../entities/admin.entity';
-import {
-  EmailOptions,
-  EmailTemplate,
-  MailerService,
-} from 'src/mailer/mailer.service';
-import { HotlinkInterface } from 'src/interfaces/hotlink';
 @Injectable()
 export class AdminAuthService {
   constructor(
@@ -37,8 +31,6 @@ export class AdminAuthService {
     private readonly adminService: AdminService,
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
-    @Inject(MailerService)
-    private readonly mailerService: MailerService,
   ) {}
 
   private readonly logger = new Logger(AdminAuthService.name);
@@ -49,7 +41,7 @@ export class AdminAuthService {
       const admin = await this.adminService.findOneByEmail(email);
       if (admin !== null) {
         throw new ConflictException(
-          'An admin with the provided email already exists',
+          'an admin with the provided email already exists ',
         );
       }
     } catch (error) {
@@ -78,36 +70,13 @@ export class AdminAuthService {
       password: hashedPassword,
       email,
     };
-    const admin = await this.adminService.create(payload).catch((error) => {
+    await this.adminService.create(payload).catch((error) => {
       this.logger.error(`error hashing password due to ${error.message}`);
       throw new InternalServerErrorException(
         'The request could not be completed',
       );
     });
 
-    const hotlinkPayload: HotlinkInterface = {
-      userId: admin.identifier,
-      userEmail: admin.email,
-      accountType: 'admin',
-    };
-
-    const generatedHotlink =
-      await this.commonAuthService.generateHotlink(hotlinkPayload);
-
-    const emailOptions: EmailOptions = {
-      recipient: {
-        name: payload.firstName,
-        emailAddress: payload.email,
-      },
-      subject: 'Welcome to Run go',
-      template: EmailTemplate.Signup,
-      data: {
-        name: payload.firstName,
-        hotlink: generatedHotlink,
-      },
-    };
-
-    await this.mailerService.sendEmail(emailOptions);
     return new ApiResponse('Admin account successfully created', null);
   }
 
@@ -152,23 +121,9 @@ export class AdminAuthService {
     try {
       const admin = await this.adminService.findOneByEmail(request.email);
       if (!admin) {
-        return new UnprocessableEntityException(
-          'An email would be sent to you if and account with the provided email exists',
-        );
+        throw new NotFoundException('Invalid email');
       }
-      const emailOptions: EmailOptions = {
-        recipient: {
-          name: admin.firstName,
-          emailAddress: admin.email,
-        },
-        subject: 'Password reset',
-        template: EmailTemplate.Forgottenpassword,
-        data: {
-          hotlink: 'http://whatever',
-          name: admin.firstName,
-        },
-      };
-      await this.mailerService.sendEmail(emailOptions);
+      //TODO: send email
     } catch (error) {
       if (error.status == HttpStatus.NOT_FOUND) {
         throw new NotFoundException(error.message);
@@ -208,44 +163,6 @@ export class AdminAuthService {
         throw new NotFoundException(error.message);
       } else {
         throw new HttpException(error.message, error.status);
-      }
-    }
-  }
-
-  public async verifyHotlink(hotlinkToken: string) {
-    try {
-      const { isValid, data } =
-        await this.commonAuthService.validateHotLink(hotlinkToken);
-      if (!isValid) {
-        throw new UnauthorizedException(
-          'it appears the link is broken please contanct support ',
-        );
-      }
-      const email = data.userEmail;
-      await this.activateAccount(email);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  private async activateAccount(email: string) {
-    try {
-      const admin = await this.adminRepository.findOneBy({ email });
-      if (!admin) {
-        throw new NotFoundException('invalid or broken email address');
-      }
-      admin.isVerified = true;
-      await this.adminRepository.save(admin);
-      //TODO; return html page
-      return new ApiResponse('account successfully verified', null);
-    } catch (error) {
-      if (error.status == HttpStatus.NOT_FOUND) {
-        throw new NotFoundException(error.message);
-      } else {
-        throw new HttpException(
-          'request could not be completed',
-          HttpStatus.UNPROCESSABLE_ENTITY,
-        );
       }
     }
   }
