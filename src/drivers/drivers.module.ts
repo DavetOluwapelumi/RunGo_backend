@@ -17,6 +17,10 @@ import { DriverProfileController } from './controllers/driver.profile.controller
     DriverProfileService,
   ],
   imports: [TypeOrmModule.forFeature([Driver])],
-  controllers: [DriverController, DriverAuthController, DriverProfileController],
+  controllers: [
+    DriverController,
+    DriverAuthController,
+    DriverProfileController,
+  ],
 })
 export class DriversModule {}

@@ -1,9 +1,9 @@
-import {IsStrongPassword} from "class-validator";
+import { IsStrongPassword } from 'class-validator';
 
 export class SetNewPasswordDTO {
-    @IsStrongPassword()
-    newPassword: string;
+  @IsStrongPassword()
+  newPassword: string;
 
-    @IsStrongPassword()
-    confirmPassword: string;
+  @IsStrongPassword()
+  confirmPassword: string;
 }
