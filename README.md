@@ -31,8 +31,8 @@ To set up the service locally, ensure [just](https://just.systems) is install
 then execute the command
 
 ```sh
-git clone https://github.com/opeolluwa/hera
-cd hera 
+git clone https://github.com/DavetOluwapelumi/RunGo_backend run-go-backend
+cd run-go-backend
 cp .env.example .env
 just start
 ```
