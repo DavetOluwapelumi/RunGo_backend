@@ -15,13 +15,13 @@ services:
       retries: 10
       start_period: 30s # Wait 30 seconds before starting health checks
     environment:
-      - DATABASE_URL=postgres://hera:hera@postgres:5432/hera
+      - DATABASE_URL=postgres://rungo:rungo@postgres:5432/rungo
       - PORT=5000
       - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
-      - DATABASE_USERNAME=hera
-      - DATABASE_PASSWORD=hera
-      - DATABASE_NAME=hera
+      - DATABASE_USERNAME=rungo
+      - DATABASE_PASSWORD=rungo
+      - DATABASE_NAME=rungo
     volumes:
       - ./:/app
   postgres:
@@ -30,9 +30,9 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=hera
-      - POSTGRES_USER=hera
-      - POSTGRES_PASSWORD=hera
+      - POSTGRES_DB=rungo
+      - POSTGRES_USER=rungo
+      - POSTGRES_PASSWORD=rungo
     ports:
       - "6543:5432"
     healthcheck:
@@ -47,21 +47,14 @@ services:
     ports:
       - "8888:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: hera@mailer.com
-      PGADMIN_DEFAULT_PASSWORD: hera
+      PGADMIN_DEFAULT_EMAIL: admin@rungo.com
+      PGADMIN_DEFAULT_PASSWORD: rungo
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
       postgres:
         condition: service_healthy
 
-  mailtutan:
-    image: mailtutan/mailtutan:latest
-    restart: always
-    ports:
-      - 1080:1080
-      - 1025:1025
-    # command: [ "mailtutan", "--smtp-auth-username=hera", " --smtp-auth-password=hera" ]
 
 volumes:
   postgres-data:
