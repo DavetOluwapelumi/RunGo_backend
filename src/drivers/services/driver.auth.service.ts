@@ -21,7 +21,7 @@ import { RequestPasswordResetDTO } from '../dto/requestPasswordReset';
 import { SetNewPasswordDTO } from '../dto/setNewPassword';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import  Driver  from '../../entities/driver.entity';
+import Driver from '../../entities/driver.entity';
 
 @Injectable()
 export class DriverAuthService {
@@ -39,15 +39,23 @@ export class DriverAuthService {
   public async register(request: CreateDriverDTO) {
     const { email, phone, name, password: rawPassword } = request;
     try {
-      const existingDriver = await this.driverService.findOneByEmailOrPhone(email, phone);
+      const existingDriver = await this.driverService.findOneByEmailOrPhone(
+        email,
+        phone,
+      );
       if (existingDriver) {
-        throw new ConflictException('A driver with this email or phone already exists.');
+        throw new ConflictException(
+          'A driver with this email or phone already exists.',
+        );
       }
     } catch (error) {
       if (error.status == HttpStatus.CONFLICT) {
         throw new ConflictException(error.message);
       } else {
-        throw new HttpException('Request could not be completed', HttpStatus.UNPROCESSABLE_ENTITY);
+        throw new HttpException(
+          'Request could not be completed',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
       }
     }
 
@@ -55,7 +63,9 @@ export class DriverAuthService {
       .hashPassword(rawPassword)
       .catch((error) => {
         this.logger.error(`Error hashing password: ${error.message}`);
-        throw new InternalServerErrorException('The request could not be completed');
+        throw new InternalServerErrorException(
+          'The request could not be completed',
+        );
       });
 
     const payload: CreateDriverDTO = {
@@ -67,7 +77,9 @@ export class DriverAuthService {
 
     await this.driverService.create(payload).catch((error) => {
       this.logger.error(`Error creating driver: ${error.message}`);
-      throw new InternalServerErrorException('The request could not be completed');
+      throw new InternalServerErrorException(
+        'The request could not be completed',
+      );
     });
 
     return new ApiResponse('Driver account successfully created', null);
@@ -75,7 +87,9 @@ export class DriverAuthService {
 
   public async login(request: LoginDriverDTO) {
     try {
-      const driver = await this.driverService.findOneByEmailOrPhone(request.emailOrPhone);
+      const driver = await this.driverService.findOneByEmailOrPhone(
+        request.emailOrPhone,
+      );
       if (!driver) {
         throw new NotFoundException('Invalid email/phone or password');
       }
@@ -97,9 +111,11 @@ export class DriverAuthService {
         accountType: 'driver',
       };
 
-      const jwtToken = await this.commonAuthService.generateJwt(jwtPayload).catch((error) => {
-        throw error;
-      });
+      const jwtToken = await this.commonAuthService
+        .generateJwt(jwtPayload)
+        .catch((error) => {
+          throw error;
+        });
 
       return new ApiResponse('Login successful', { jwtToken });
     } catch (error) {
@@ -127,9 +143,14 @@ export class DriverAuthService {
     }
   }
 
-  public async setNewPassword(request: SetNewPasswordDTO, authorizedUser: JwtPayload) {
+  public async setNewPassword(
+    request: SetNewPasswordDTO,
+    authorizedUser: JwtPayload,
+  ) {
     try {
-      const driver = await this.driverService.findOneByEmail(authorizedUser.userEmail);
+      const driver = await this.driverService.findOneByEmail(
+        authorizedUser.userEmail,
+      );
       if (!driver) {
         throw new NotFoundException('Invalid email');
       }
@@ -138,9 +159,11 @@ export class DriverAuthService {
         throw new BadRequestException('Passwords do not match');
       }
 
-      const hashedPassword = await this.commonAuthService.hashPassword(request.newPassword).catch((error) => {
-        throw error;
-      });
+      const hashedPassword = await this.commonAuthService
+        .hashPassword(request.newPassword)
+        .catch((error) => {
+          throw error;
+        });
 
       driver.password = hashedPassword;
       await this.driverRepository.save(driver).catch((error) => {
