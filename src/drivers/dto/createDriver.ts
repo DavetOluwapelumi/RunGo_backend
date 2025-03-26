@@ -5,10 +5,10 @@ export class CreateDriverDTO {
   email: string;
 
   @IsNotEmpty()
-  firstName: string;
+  name: string;
 
   @IsNotEmpty()
-  lastName: string;
+  phone: string;
 
   @IsStrongPassword()
   password: string;

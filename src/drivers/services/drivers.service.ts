@@ -9,7 +9,7 @@ export class DriverService {
   @InjectRepository(Driver)
   private readonly driverRepository: Repository<Driver>;
 
-  public async findOneByEmail(email: string): Promise<Driver> {
+  public async findOneByEmail(email: string, phone?: string): Promise<Driver> {
     return await this.driverRepository.findOneBy({ email });
   }
 

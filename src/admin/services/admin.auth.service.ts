@@ -45,11 +45,16 @@ export class AdminAuthService {
         );
       }
     } catch (error) {
-      if (error.status == HttpStatus.CONFLICT) {
-        throw new ConflictException(error.message);
+      if (typeof error === "object" && error !== null && "status" in error ) {
+        const err = error as {status: number; message: string};
+        if(err.status = HttpStatus.CONFLICT){
+          throw new ConflictException(err.message);
+        }        
       } else {
         throw new HttpException(
-          'request could not be completed',
+          typeof error === "object" && error !== null && "status" in error
+          ?(error as any).message
+          :"An unexpected error occured",
           HttpStatus.UNPROCESSABLE_ENTITY,
         );
       }
@@ -109,12 +114,20 @@ export class AdminAuthService {
         });
       return new ApiResponse('login successful', { jwtToken });
     } catch (error) {
-      if (error.status == HttpStatus.CONFLICT) {
-        throw new ConflictException(error.message);
-      } else {
-        throw new HttpException(error.message, HttpStatus.UNPROCESSABLE_ENTITY);
+      if (typeof error === "object" && error !== null && "status" in error) {
+        const err = error as { status: number; message?: string };
+    
+        if (err.status === HttpStatus.CONFLICT) {
+          throw new ConflictException(err.message || "Conflict error occurred");
+        } else {
+          throw new HttpException(err.message || "Request could not be processed", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
       }
+    
+      // Fallback for unknown errors
+      throw new HttpException("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    
   }
 
   public async requestPasswordReset(request: RequestPasswordResetDTO) {
@@ -123,14 +136,17 @@ export class AdminAuthService {
       if (!admin) {
         throw new NotFoundException('Invalid email');
       }
-      //TODO: send email
+      
     } catch (error) {
-      if (error.status == HttpStatus.NOT_FOUND) {
-        throw new NotFoundException(error.message);
-      } else {
-        throw new UnprocessableEntityException(error.message);
-      }
-    }
+      if (typeof error === "object" && error !== null && "status" in error) {
+        const err = error as { status: number; message?: string };
+    
+        if (err.status === HttpStatus.NOT_FOUND) {
+          throw new NotFoundException(err.message || "Resource not found");
+        } else {
+          throw new UnprocessableEntityException(err.message || "Invalid request");
+        }
+      }}
   }
 
   public async setNewPassword(
@@ -159,11 +175,19 @@ export class AdminAuthService {
         throw error;
       });
     } catch (error) {
-      if (error.status == HttpStatus.NOT_FOUND) {
-        throw new NotFoundException(error.message);
-      } else {
-        throw new HttpException(error.message, error.status);
+      if (typeof error === "object" && error !== null && "status" in error) {
+        const err = error as { status: number; message?: string };
+    
+        if (err.status === HttpStatus.NOT_FOUND) {
+          throw new NotFoundException(err.message || "Resource not found");
+        } else {
+          throw new HttpException(err.message || "An error occurred", err.status);
+        }
       }
+    
+      // Fallback for unknown errors
+      throw new HttpException("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    
   }
 }
