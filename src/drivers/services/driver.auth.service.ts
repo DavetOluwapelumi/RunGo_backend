@@ -48,7 +48,7 @@ export class DriverAuthService {
           'A driver with this email or phone already exists.',
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error.status == HttpStatus.CONFLICT) {
         throw new ConflictException(error.message);
       } else {
@@ -118,7 +118,7 @@ export class DriverAuthService {
         });
 
       return new ApiResponse('Login successful', { jwtToken });
-    } catch (error) {
+    } catch (error: any) {
       if (error.status == HttpStatus.CONFLICT) {
         throw new ConflictException(error.message);
       } else {
@@ -134,7 +134,7 @@ export class DriverAuthService {
         throw new NotFoundException('Invalid email');
       }
       // TODO: Implement email sending logic here
-    } catch (error) {
+    } catch (error: any) {
       if (error.status == HttpStatus.NOT_FOUND) {
         throw new NotFoundException(error.message);
       } else {
@@ -171,7 +171,7 @@ export class DriverAuthService {
       });
 
       return new ApiResponse('Password successfully updated', null);
-    } catch (error) {
+    } catch (error: any) {
       if (error.status == HttpStatus.NOT_FOUND) {
         throw new NotFoundException(error.message);
       } else {

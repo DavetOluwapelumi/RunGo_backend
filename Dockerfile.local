@@ -5,7 +5,9 @@ WORKDIR /app
 
 COPY  . .
 
-RUN npm install 
+RUN npm install --save
+
+RUN npm install -D @nestjs/cli 
 
 EXPOSE 5000
 

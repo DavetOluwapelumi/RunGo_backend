@@ -44,7 +44,7 @@ export class AdminAuthService {
           'an admin with the provided email already exists ',
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error.status == HttpStatus.CONFLICT) {
         throw new ConflictException(error.message);
       } else {
@@ -108,7 +108,7 @@ export class AdminAuthService {
           throw error;
         });
       return new ApiResponse('login successful', { jwtToken });
-    } catch (error) {
+    } catch (error: any) {
       if (error.status == HttpStatus.CONFLICT) {
         throw new ConflictException(error.message);
       } else {
@@ -124,7 +124,7 @@ export class AdminAuthService {
         throw new NotFoundException('Invalid email');
       }
       //TODO: send email
-    } catch (error) {
+    } catch (error: any) {
       if (error.status == HttpStatus.NOT_FOUND) {
         throw new NotFoundException(error.message);
       } else {
@@ -158,7 +158,7 @@ export class AdminAuthService {
       await this.adminRepository.save(admin).catch((error) => {
         throw error;
       });
-    } catch (error) {
+    } catch (error: any) {
       if (error.status == HttpStatus.NOT_FOUND) {
         throw new NotFoundException(error.message);
       } else {
