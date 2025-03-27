@@ -52,12 +52,14 @@ export class DriverAuthService {
           'A driver with this email or phone already exists.',
         );
       }
+
     } catch (error) {
       if (typeof error === "object" && error !== null && "status" in error) {
         const err = error as { status: number; message: string };
         if (err.status === HttpStatus.CONFLICT) {
           throw new ConflictException(err.message);
         }
+=
       }
       throw new HttpException(
         "Request could not be completed",
@@ -123,12 +125,15 @@ export class DriverAuthService {
         });
 
       return new ApiResponse('Login successful', { jwtToken });
+
     } catch (error) {
       if (typeof error === "object" && error !== null && "status" in error) {
         const err = error as { status: number; message: string };
         if (err.status === HttpStatus.CONFLICT) {
           throw new ConflictException(err.message);
         }
+
+    
       }
       throw new HttpException(
         typeof error === "object" && error !== null && "message" in error
@@ -146,6 +151,7 @@ export class DriverAuthService {
       if (!driver) {
         throw new NotFoundException('Invalid email');
       }
+
       
     } catch (error) {
       if (typeof error === "object" && error !== null && "status" in error) {
@@ -154,6 +160,7 @@ export class DriverAuthService {
         if (err.status === HttpStatus.NOT_FOUND) {
           throw new NotFoundException(err.message);
         }
+
       }
     
       throw new UnprocessableEntityException(
@@ -193,6 +200,7 @@ export class DriverAuthService {
       });
 
       return new ApiResponse('Password successfully updated', null);
+
     } catch (error) {
       if (typeof error === "object" && error !== null && "status" in error) {
         const err = error as { status: number; message: string };
@@ -202,6 +210,7 @@ export class DriverAuthService {
         } else {
           throw new HttpException(err.message, err.status);
         }
+
       }
     
       // Fallback in case `error` does not have `.status`

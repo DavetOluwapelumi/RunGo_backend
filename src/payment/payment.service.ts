@@ -26,7 +26,7 @@ export class PaymentService {
 
       await this.paymentRepository.save(payment);
       return payment;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         `Fatal: couldn't create payment due to ${error.message}`,
       );

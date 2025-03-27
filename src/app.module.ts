@@ -46,7 +46,7 @@ import typeorm from './config/typeorm';
     ]),
     AuthModule,
     UsersModule,
-    DriversModule,
+    // DriversModule,
     AdminModule,
     PaymentModule,
     BookingModule,

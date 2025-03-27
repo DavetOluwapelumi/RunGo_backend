@@ -44,6 +44,7 @@ export class AdminAuthService {
           'an admin with the provided email already exists ',
         );
       }
+
     } catch (error) {
       if (typeof error === "object" && error !== null && "status" in error ) {
         const err = error as {status: number; message: string};
@@ -113,6 +114,7 @@ export class AdminAuthService {
           throw error;
         });
       return new ApiResponse('login successful', { jwtToken });
+
     } catch (error) {
       if (typeof error === "object" && error !== null && "status" in error) {
         const err = error as { status: number; message?: string };
@@ -122,6 +124,8 @@ export class AdminAuthService {
         } else {
           throw new HttpException(err.message || "Request could not be processed", HttpStatus.UNPROCESSABLE_ENTITY);
         }
+
+    
       }
     
       // Fallback for unknown errors
@@ -136,6 +140,7 @@ export class AdminAuthService {
       if (!admin) {
         throw new NotFoundException('Invalid email');
       }
+
       
     } catch (error) {
       if (typeof error === "object" && error !== null && "status" in error) {
@@ -147,6 +152,7 @@ export class AdminAuthService {
           throw new UnprocessableEntityException(err.message || "Invalid request");
         }
       }}
+
   }
 
   public async setNewPassword(
@@ -174,6 +180,7 @@ export class AdminAuthService {
       await this.adminRepository.save(admin).catch((error) => {
         throw error;
       });
+
     } catch (error) {
       if (typeof error === "object" && error !== null && "status" in error) {
         const err = error as { status: number; message?: string };
@@ -183,6 +190,7 @@ export class AdminAuthService {
         } else {
           throw new HttpException(err.message || "An error occurred", err.status);
         }
+
       }
     
       // Fallback for unknown errors
