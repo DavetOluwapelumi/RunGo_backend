@@ -39,6 +39,7 @@ export default class Driver {
 
   @Column()
   isVerified: boolean;
+  id: string;
 
   @BeforeInsert()
   async setIdentifier() {
