@@ -5,7 +5,10 @@ export class CreateDriverDTO {
   email: string;
 
   @IsNotEmpty()
-  name: string;
+  firstName: string;
+
+  @IsNotEmpty()
+  lastName: string;
 
   @IsNotEmpty()
   phone: string;

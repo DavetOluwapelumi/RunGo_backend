@@ -25,9 +25,6 @@ import Driver from '../../entities/driver.entity';
 
 @Injectable()
 export class DriverAuthService {
-  verifyHotlink(arg0: string) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @Inject(CommonAuthService)
     private readonly commonAuthService: CommonAuthService,
@@ -38,32 +35,36 @@ export class DriverAuthService {
   ) {}
 
   private readonly logger = new Logger(DriverAuthService.name);
-  
-  
+
+  public async verifyHotlink(link: string) {
+    console.log({ link });
+    throw 'inmplemented';
+  }
   public async register(request: CreateDriverDTO) {
-    const { email, phone, name, password: rawPassword } = request;
+    const {
+      email,
+      phone,
+      firstName,
+      lastName,
+      password: rawPassword,
+    } = request;
     try {
-      const existingDriver = await this.driverService.findOneByEmail(
-        email,
-        phone,
-      );
+      const existingDriver = await this.driverService.findOneByEmail(email);
       if (existingDriver) {
         throw new ConflictException(
           'A driver with this email or phone already exists.',
         );
       }
-
     } catch (error) {
-      if (typeof error === "object" && error !== null && "status" in error) {
+      if (typeof error === 'object' && error !== null && 'status' in error) {
         const err = error as { status: number; message: string };
         if (err.status === HttpStatus.CONFLICT) {
           throw new ConflictException(err.message);
         }
-=
       }
       throw new HttpException(
-        "Request could not be completed",
-        HttpStatus.UNPROCESSABLE_ENTITY
+        'Request could not be completed',
+        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
     const hashedPassword = await this.commonAuthService
@@ -76,7 +77,8 @@ export class DriverAuthService {
       });
 
     const payload: CreateDriverDTO = {
-      name,
+      firstName,
+      lastName,
       email,
       phone,
       password: hashedPassword,
@@ -94,9 +96,7 @@ export class DriverAuthService {
 
   public async login(request: LoginDriverDTO) {
     try {
-      const driver = await this.driverService.findOneByEmail(
-        request.email,
-      );
+      const driver = await this.driverService.findOneByEmail(request.email);
       if (!driver) {
         throw new NotFoundException('Invalid email/phone or password');
       }
@@ -125,24 +125,20 @@ export class DriverAuthService {
         });
 
       return new ApiResponse('Login successful', { jwtToken });
-
     } catch (error) {
-      if (typeof error === "object" && error !== null && "status" in error) {
+      if (typeof error === 'object' && error !== null && 'status' in error) {
         const err = error as { status: number; message: string };
         if (err.status === HttpStatus.CONFLICT) {
           throw new ConflictException(err.message);
         }
-
-    
       }
       throw new HttpException(
-        typeof error === "object" && error !== null && "message" in error
+        typeof error === 'object' && error !== null && 'message' in error
           ? (error as any).message
-          : "An unexpected error occurred",
-        HttpStatus.UNPROCESSABLE_ENTITY
+          : 'An unexpected error occurred',
+        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-    
   }
 
   public async requestPasswordReset(request: RequestPasswordResetDTO) {
@@ -151,25 +147,21 @@ export class DriverAuthService {
       if (!driver) {
         throw new NotFoundException('Invalid email');
       }
-
-      
     } catch (error) {
-      if (typeof error === "object" && error !== null && "status" in error) {
+      if (typeof error === 'object' && error !== null && 'status' in error) {
         const err = error as { status: number; message: string };
-    
+
         if (err.status === HttpStatus.NOT_FOUND) {
           throw new NotFoundException(err.message);
         }
-
       }
-    
+
       throw new UnprocessableEntityException(
-        (typeof error === "object" && error !== null && "message" in error)
+        typeof error === 'object' && error !== null && 'message' in error
           ? (error as any).message
-          : "An unexpected error occurred"
+          : 'An unexpected error occurred',
       );
     }
-    
   }
 
   public async setNewPassword(
@@ -200,27 +192,24 @@ export class DriverAuthService {
       });
 
       return new ApiResponse('Password successfully updated', null);
-
     } catch (error) {
-      if (typeof error === "object" && error !== null && "status" in error) {
+      if (typeof error === 'object' && error !== null && 'status' in error) {
         const err = error as { status: number; message: string };
-    
+
         if (err.status === HttpStatus.NOT_FOUND) {
           throw new NotFoundException(err.message);
         } else {
           throw new HttpException(err.message, err.status);
         }
-
       }
-    
+
       // Fallback in case `error` does not have `.status`
       throw new HttpException(
-        typeof error === "object" && error !== null && "message" in error
+        typeof error === 'object' && error !== null && 'message' in error
           ? (error as any).message
-          : "An unexpected error occurred",
-        HttpStatus.INTERNAL_SERVER_ERROR
+          : 'An unexpected error occurred',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    
   }
 }

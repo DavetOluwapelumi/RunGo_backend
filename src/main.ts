@@ -1,11 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as compression from 'compression';
 import helmet from 'helmet';
-
 import { DataSource } from 'typeorm';
 import { dataSourceOptions } from './config/typeorm';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const compression = require('compression');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
