@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonAuthService } from 'src/auth/auth.service.common';
-import { Driver } from '../entities/driver.entity';
 import { DriverAuthController } from './controllers/driver.auth.controller';
-import { DriverController } from './controllers/driver.controller';
-import { DriverService } from './services/driver.service';
 import { DriverAuthService } from './services/driver.auth.service';
-import { DriverProfileService } from './services/driver.profile.service';
 import { DriverProfileController } from './controllers/driver.profile.controller';
-
+import { DriverService } from './services/drivers.service';
+import Driver from 'src/entities/driver.entity';
+import { DriversController } from './controllers/drivers.controller';
+import { DriverProfileService } from './services/driver.profile.service';
 @Module({
   providers: [
     DriverService,
@@ -18,7 +17,7 @@ import { DriverProfileController } from './controllers/driver.profile.controller
   ],
   imports: [TypeOrmModule.forFeature([Driver])],
   controllers: [
-    DriverController,
+    DriversController,
     DriverAuthController,
     DriverProfileController,
   ],

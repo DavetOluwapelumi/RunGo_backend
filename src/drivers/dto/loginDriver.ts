@@ -1,7 +1,7 @@
-import { isEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class LoginDriverDTO {
-  @isEmail()
+  @IsEmail()
   email: string;
 
   @IsNotEmpty()
