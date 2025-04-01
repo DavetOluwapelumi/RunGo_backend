@@ -145,8 +145,15 @@ export class DriverAuthService {
     try {
       const driver = await this.driverService.findOneByEmail(request.email);
       if (!driver) {
-        throw new NotFoundException('Invalid email');
+        throw new NotFoundException(
+          'It appears the emmail is not registered on our servers',
+        );
       }
+      //TODO: send  else send email
+      return new ApiResponse(
+        'You would receive and email with further instructions',
+        null,
+      );
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'status' in error) {
         const err = error as { status: number; message: string };

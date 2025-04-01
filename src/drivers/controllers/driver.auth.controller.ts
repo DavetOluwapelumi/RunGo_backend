@@ -40,12 +40,13 @@ export class DriverAuthController {
     return this.driverAuthService.login(request);
   }
 
-  @Post('password')
+  @HttpCode(200)
+  @Post('reset-password')
   async driverPasswordReset(@Body() request: RequestPasswordResetDTO) {
     return this.driverAuthService.requestPasswordReset(request);
   }
 
-  @Put('password')
+  @Put('reset-password')
   async driverSetNewPassword(
     @Body() request: SetNewPasswordDTO,
     @Request() authorizedUser: JwtPayload,
