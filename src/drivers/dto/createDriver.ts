@@ -11,9 +11,8 @@ export class CreateDriverDTO {
   lastName: string;
 
   @IsNotEmpty()
-  phone: string;
+  phoneNumber: string;
 
   @IsStrongPassword()
   password: string;
-  
 }

@@ -18,13 +18,14 @@ export class DriverService {
   }
 
   public async create(payload: CreateDriverDTO): Promise<Driver> {
-    const { email, password, firstName, lastName } = payload;
+    const { email, password, firstName, lastName, phoneNumber } = payload;
     const newDriver = this.driverRepository.create();
 
     newDriver.email = email;
     newDriver.password = password;
     newDriver.firstName = firstName;
     newDriver.lastName = lastName;
+    newDriver.phoneNumber = phoneNumber;
 
     return await this.driverRepository.save(newDriver);
   }

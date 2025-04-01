@@ -43,7 +43,7 @@ export class DriverAuthService {
   public async register(request: CreateDriverDTO) {
     const {
       email,
-      phone,
+      phoneNumber,
       firstName,
       lastName,
       password: rawPassword,
@@ -80,7 +80,7 @@ export class DriverAuthService {
       firstName,
       lastName,
       email,
-      phone,
+      phoneNumber,
       password: hashedPassword,
     };
 
