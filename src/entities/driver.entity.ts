@@ -7,7 +7,7 @@ export default class Driver {
   @PrimaryColumn()
   identifier: string;
 
-  @Column()
+  @Column({nullable: true, type: "varchar"})
   carIdentifier: string;
 
   @Column()
