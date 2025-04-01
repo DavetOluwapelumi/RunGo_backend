@@ -15,4 +15,5 @@ export class CreateDriverDTO {
 
   @IsStrongPassword()
   password: string;
+  
 }
