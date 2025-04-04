@@ -21,11 +21,11 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
 
-  // const dataSource = new DataSource(dataSourceOptions);
-  // await dataSource.initialize();
-  // await dataSource.runMigrations({
-  //   transaction: 'all',
-  // });
+  const dataSource = new DataSource(dataSourceOptions);
+  await dataSource.initialize();
+  await dataSource.runMigrations({
+    transaction: 'all',
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsStrongPassword } from 'class-validator';
 
-export class CreateDriverDTO {
+export class CreateUserDTO {
   @IsEmail()
   email: string;
 
@@ -11,7 +11,10 @@ export class CreateDriverDTO {
   lastName: string;
 
   @IsNotEmpty()
-  phone: string;
+  phoneNumber: string;
+
+  @IsNotEmpty()
+  matricNumber: string;
 
   @IsStrongPassword()
   password: string;

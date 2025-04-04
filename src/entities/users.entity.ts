@@ -17,6 +17,9 @@ export default class User {
   email: string;
 
   @Column()
+  phoneNumber: string;
+
+  @Column()
   password: string;
 
   @Column({
@@ -33,6 +36,7 @@ export default class User {
 
   @Column()
   isVerified: boolean;
+  id: string;
 
   @BeforeInsert()
   async setIdentifier() {

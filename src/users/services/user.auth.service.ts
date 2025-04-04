@@ -12,47 +12,43 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { CommonAuthService } from '../../auth/auth.service.common';
-import { CreateDriverDTO } from 'src/drivers/dto/createDriver';
-import { DriverService } from './drivers.service';
+import { CreateUserDTO } from 'src/users/dto/createUser';
+import { UserService } from './users.service';
 import { ApiResponse } from 'src/adapters/apiResponse';
-import { LoginDriverDTO } from '../dto/loginDriver';
+import { LoginUserDTO } from '../dto/loginUser';
 import { JwtPayload } from 'src/interfaces/jwt';
 import { RequestPasswordResetDTO } from '../dto/requestPasswordReset';
 import { SetNewPasswordDTO } from '../dto/setNewPassword';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import Driver from '../../entities/driver.entity';
+import User from '../../entities/users.entity';
 
 @Injectable()
-export class DriverAuthService {
+export class UserAuthService {
   constructor(
     @Inject(CommonAuthService)
     private readonly commonAuthService: CommonAuthService,
-    @Inject(DriverService)
-    private readonly driverService: DriverService,
-    @InjectRepository(Driver)
-    private readonly driverRepository: Repository<Driver>,
+    @Inject(UserService)
+    private readonly userService: UserService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  private readonly logger = new Logger(DriverAuthService.name);
+  private readonly logger = new Logger(UserAuthService.name);
 
-  public async verifyHotlink(link: string) {
-    console.log({ link });
-    throw 'inmplemented';
-  }
-  public async register(request: CreateDriverDTO) {
+  public async register(request: CreateUserDTO) {
     const {
       email,
-      phone,
+      phoneNumber,
       firstName,
       lastName,
       password: rawPassword,
     } = request;
     try {
-      const existingDriver = await this.driverService.findOneByEmail(email);
-      if (existingDriver) {
+      const existingUser = await this.userService.findOneByEmail(email);
+      if (existingUser) {
         throw new ConflictException(
-          'A driver with this email or phone already exists.',
+          'A user with this email or phone already exists.',
         );
       }
     } catch (error) {
@@ -67,6 +63,7 @@ export class DriverAuthService {
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
+
     const hashedPassword = await this.commonAuthService
       .hashPassword(rawPassword)
       .catch((error) => {
@@ -76,33 +73,36 @@ export class DriverAuthService {
         );
       });
 
-    const payload: CreateDriverDTO = {
+    const payload: CreateUserDTO = {
       firstName,
       lastName,
       email,
-      phone,
+      phoneNumber,
+      matricNumber: request.matricNumber,
       password: hashedPassword,
     };
 
-    await this.driverService.create(payload).catch((error) => {
-      this.logger.error(`Error creating driver: ${error.message}`);
+    await this.userService.create(payload).catch((error) => {
+      this.logger.error(`Error creating user: ${error.message}`);
       throw new InternalServerErrorException(
         'The request could not be completed',
       );
     });
 
-    return new ApiResponse('Driver account successfully created', null);
+    return new ApiResponse('User account successfully created', null);
   }
 
-  public async login(request: LoginDriverDTO) {
+  public async login(request: LoginUserDTO) {
     try {
-      const driver = await this.driverService.findOneByEmail(request.email);
-      if (!driver) {
+      const user = await this.userService.findOneByIdentifier(
+        request.matricNumber,
+      );
+      if (!user) {
         throw new NotFoundException('Invalid email/phone or password');
       }
 
       const isCorrectPassword = await this.commonAuthService
-        .validatePasswordHash(driver.password, request.password)
+        .validatePasswordHash(user.password, request.password)
         .catch((error) => {
           this.logger.error(error.message);
           throw error;
@@ -113,9 +113,9 @@ export class DriverAuthService {
       }
 
       const jwtPayload: JwtPayload = {
-        userEmail: driver.email,
-        userId: driver.id,
-        accountType: 'driver',
+        userEmail: user.email,
+        userId: user.id,
+        accountType: 'user',
       };
 
       const jwtToken = await this.commonAuthService
@@ -126,12 +126,6 @@ export class DriverAuthService {
 
       return new ApiResponse('Login successful', { jwtToken });
     } catch (error) {
-      if (typeof error === 'object' && error !== null && 'status' in error) {
-        const err = error as { status: number; message: string };
-        if (err.status === HttpStatus.CONFLICT) {
-          throw new ConflictException(err.message);
-        }
-      }
       throw new HttpException(
         typeof error === 'object' && error !== null && 'message' in error
           ? (error as any).message
@@ -143,19 +137,18 @@ export class DriverAuthService {
 
   public async requestPasswordReset(request: RequestPasswordResetDTO) {
     try {
-      const driver = await this.driverService.findOneByEmail(request.email);
-      if (!driver) {
-        throw new NotFoundException('Invalid email');
+      const user = await this.userService.findOneByEmail(request.email);
+      if (!user) {
+        throw new NotFoundException(
+          'It appears the email is not registered on our servers',
+        );
       }
+      //TODO: send email with reset instructions
+      return new ApiResponse(
+        'You would receive an email with further instructions',
+        null,
+      );
     } catch (error) {
-      if (typeof error === 'object' && error !== null && 'status' in error) {
-        const err = error as { status: number; message: string };
-
-        if (err.status === HttpStatus.NOT_FOUND) {
-          throw new NotFoundException(err.message);
-        }
-      }
-
       throw new UnprocessableEntityException(
         typeof error === 'object' && error !== null && 'message' in error
           ? (error as any).message
@@ -169,10 +162,10 @@ export class DriverAuthService {
     authorizedUser: JwtPayload,
   ) {
     try {
-      const driver = await this.driverService.findOneByEmail(
+      const user = await this.userService.findOneByEmail(
         authorizedUser.userEmail,
       );
-      if (!driver) {
+      if (!user) {
         throw new NotFoundException('Invalid email');
       }
 
@@ -186,24 +179,13 @@ export class DriverAuthService {
           throw error;
         });
 
-      driver.password = hashedPassword;
-      await this.driverRepository.save(driver).catch((error) => {
+      user.password = hashedPassword;
+      await this.userRepository.save(user).catch((error) => {
         throw error;
       });
 
       return new ApiResponse('Password successfully updated', null);
     } catch (error) {
-      if (typeof error === 'object' && error !== null && 'status' in error) {
-        const err = error as { status: number; message: string };
-
-        if (err.status === HttpStatus.NOT_FOUND) {
-          throw new NotFoundException(err.message);
-        } else {
-          throw new HttpException(err.message, err.status);
-        }
-      }
-
-      // Fallback in case `error` does not have `.status`
       throw new HttpException(
         typeof error === 'object' && error !== null && 'message' in error
           ? (error as any).message
