@@ -42,7 +42,10 @@ export default class Driver {
   id: string;
 
   @BeforeInsert()
-  async setIdentifier() {
+  async setDefaults() {
     this.identifier = ulid();
+    this.dateAdded = new Date();
+    this.lastUpdatedAt = new Date();
+    this.isVerified = false;
   }
 }
