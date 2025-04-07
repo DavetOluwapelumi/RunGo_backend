@@ -22,6 +22,9 @@ export default class User {
   @Column()
   password: string;
 
+  @Column()
+  matricNumber: string;
+  
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
@@ -39,7 +42,13 @@ export default class User {
   id: string;
 
   @BeforeInsert()
-  async setIdentifier() {
+  async setDefaults() {
     this.identifier = ulid();
+    this.dateAdded = new Date();
+    this.lastUpdatedAt = new Date();
+    this.isVerified = false;
+    if (!this.matricNumber) {
+      this.matricNumber = 'RUN/DEPT/DIGITS'; 
+    }
   }
 }
