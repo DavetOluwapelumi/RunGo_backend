@@ -97,8 +97,10 @@ export class UserAuthService {
       const user = await this.userService.findOneByIdentifier(
         request.matricNumber,
       );
+      console.log('user', user);
       if (!user) {
-        throw new NotFoundException('Invalid email/phone or password');
+        this.logger.error(`User not found for matricNumber: ${request.matricNumber}`);
+        throw new NotFoundException('Invalid matric number or password');
       }
 
       const isCorrectPassword = await this.commonAuthService

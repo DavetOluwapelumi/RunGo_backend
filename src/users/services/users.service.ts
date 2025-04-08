@@ -13,12 +13,13 @@ export class UserService {
     return await this.userRepository.findOneBy({ email });
   }
 
-  public async findOneByIdentifier(identifier: string): Promise<User> {
-    return await this.userRepository.findOneBy({ identifier });
+  public async findOneByIdentifier(matricNumber: string): Promise<User> {
+    console.log(`Searching for user with matricNumber: ${matricNumber}`);
+    return await this.userRepository.findOneBy({ matricNumber });
   }
 
   public async create(payload: CreateUserDTO): Promise<User> {
-    const { email, password, firstName, lastName, phoneNumber } = payload;
+    const { email, password, firstName, lastName, phoneNumber, matricNumber } = payload;
     const newUser = this.userRepository.create();
 
     newUser.email = email;
@@ -26,6 +27,7 @@ export class UserService {
     newUser.firstName = firstName;
     newUser.lastName = lastName;
     newUser.phoneNumber = phoneNumber;
+    newUser.matricNumber = matricNumber;
 
     return await this.userRepository.save(newUser);
   }

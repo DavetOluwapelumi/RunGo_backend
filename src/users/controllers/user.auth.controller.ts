@@ -28,4 +28,24 @@ export class UserAuthController {
   async createUser(@Body() request: CreateUserDTO) {
     return this.userAuthService.register(request);
   }
+
+  @Post('login')
+  async loginUserUser(@Body() loginUserDTO: LoginUserDTO) {
+  console.log('loginUserDTO', loginUserDTO);
+  return this.userAuthService.login(loginUserDTO);
+  }
+
+  @HttpCode(200)
+    @Post('reset-password')
+    async userPasswordReset(@Body() request: RequestPasswordResetDTO) {
+      return this.userAuthService.requestPasswordReset(request);
+    }
+
+    @Put('set-password')
+      async userSetNewPassword(
+        @Body() request: SetNewPasswordDTO,
+        @Request() authorizedUser: JwtPayload,
+      ) {
+        return this.userAuthService.setNewPassword(request, authorizedUser);
+      }
 }

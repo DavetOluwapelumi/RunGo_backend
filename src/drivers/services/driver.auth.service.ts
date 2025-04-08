@@ -146,7 +146,7 @@ export class DriverAuthService {
       const driver = await this.driverService.findOneByEmail(request.email);
       if (!driver) {
         throw new NotFoundException(
-          'It appears the emmail is not registered on our servers',
+          'It appears the email is not registered on our servers',
         );
       }
       //TODO: send  else send email

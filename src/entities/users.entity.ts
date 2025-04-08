@@ -22,7 +22,7 @@ export default class User {
   @Column()
   password: string;
 
-  @Column()
+  @Column({ unique: true})
   matricNumber: string;
   
   @Column({
