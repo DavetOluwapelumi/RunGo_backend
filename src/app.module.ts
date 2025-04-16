@@ -13,6 +13,7 @@ import { CarModule } from './car/car.module';
 import { UsersModule } from './users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { StatsModule } from './stats/stats.module';
+import { OtpModule } from './otp/otp.module';
 import typeorm from './config/typeorm';
 
 @Module({
@@ -56,6 +57,7 @@ import typeorm from './config/typeorm';
     BookingModule,
     CarModule,
     StatsModule,
+    OtpModule,
   ],
   controllers: [AppController],
   providers: [AppService],
