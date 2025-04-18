@@ -9,6 +9,9 @@ export class OtpEntity {
   @Column({ type:'varchar', unique: true, length: 6  })
   identifier: string;
 
+  @Column({ type: 'varchar', length: 6 })
+  token: string;
+
   @Column({type: "bigint"})
   validityPeriod: number;
 
@@ -16,11 +19,12 @@ export class OtpEntity {
   createdAt: Date;
 
   @UpdateDateColumn()
-updatedAt: Date;
+  updatedAt: Date;
 
   @BeforeInsert()
   setDefaults() {
     this.identifier = ulid();
+    this.token = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
     this.validityPeriod = Math.floor(Date.now() / 1000) + 300; // 5 minutes from now
   }
 }

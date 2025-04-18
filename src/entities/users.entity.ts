@@ -1,6 +1,7 @@
 import { USER_INFORMATION } from 'src/constants/tableNames';
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 import { ulid } from 'ulid';
+import { OtpEntity } from './otp.entity';
 
 @Entity(USER_INFORMATION)
 export default class User {
@@ -41,6 +42,9 @@ export default class User {
   isVerified: boolean;
   id: string;
 
+  @Column({ nullable: true })
+  otpIdentifier: string;
+
   @BeforeInsert()
   async setDefaults() {
     this.identifier = ulid();
@@ -51,4 +55,5 @@ export default class User {
       this.matricNumber = 'RUN/DEPT/DIGITS'; 
     }
   }
+  
 }
