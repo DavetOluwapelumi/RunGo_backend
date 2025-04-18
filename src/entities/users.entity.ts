@@ -1,6 +1,7 @@
 import { USER_INFORMATION } from 'src/constants/tableNames';
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 import { ulid } from 'ulid';
+import { OtpEntity } from './otp.entity';
 
 @Entity(USER_INFORMATION)
 export default class User {
@@ -17,8 +18,14 @@ export default class User {
   email: string;
 
   @Column()
+  phoneNumber: string;
+
+  @Column()
   password: string;
 
+  @Column({ unique: true})
+  matricNumber: string;
+  
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
@@ -33,9 +40,20 @@ export default class User {
 
   @Column()
   isVerified: boolean;
+  id: string;
+
+  @Column({ nullable: true })
+  otpIdentifier: string;
 
   @BeforeInsert()
-  async setIdentifier() {
+  async setDefaults() {
     this.identifier = ulid();
+    this.dateAdded = new Date();
+    this.lastUpdatedAt = new Date();
+    this.isVerified = false;
+    if (!this.matricNumber) {
+      this.matricNumber = 'RUN/DEPT/DIGITS'; 
+    }
   }
+  
 }
