@@ -13,14 +13,19 @@ import { CarModule } from './car/car.module';
 import { UsersModule } from './users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { StatsModule } from './stats/stats.module';
+import { OtpModule } from './otp/otp.module';
 import typeorm from './config/typeorm';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) =>
-        configService.get('typeorm'),
+      useFactory: async (configService: ConfigService) => {
+        const config = configService.getOrThrow('typeorm')
+        console.log('config', config)
+        return config
+
+      }
     }),
     MailerModule.forRoot({
       transport: "smtp://'':''@mailtutan",
@@ -52,6 +57,7 @@ import typeorm from './config/typeorm';
     BookingModule,
     CarModule,
     StatsModule,
+    OtpModule,
   ],
   controllers: [AppController],
   providers: [AppService],

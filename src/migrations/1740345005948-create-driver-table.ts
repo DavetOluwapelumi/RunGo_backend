@@ -15,6 +15,7 @@ export class CreateDriverTable1740345005948 implements MigrationInterface {
           {
             name: 'carIdentifier',
             type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'firstName',
