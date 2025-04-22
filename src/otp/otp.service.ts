@@ -20,8 +20,15 @@ export class OtpService {
     if (!otp) {
       return false;
     }
+      const currentTime = Math.floor(Date.now() / 1000);
+      const otpHasExpired = otp.validityPeriod >= currentTime;
+      const invalidToken = otp.token !== token.trim()
 
-    const currentTime = Math.floor(Date.now() / 1000);
-    return otp.validityPeriod >= currentTime;
+      if (invalidToken||otpHasExpired){
+      return false;}
+
+    return true;
+
   }
+
 }

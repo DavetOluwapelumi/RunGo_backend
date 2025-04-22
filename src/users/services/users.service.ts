@@ -14,7 +14,6 @@ export class UserService {
   }
 
   public async findOneByIdentifier(matricNumber: string): Promise<User> {
-    console.log(`Searching for user with matricNumber: ${matricNumber}`);
     return await this.userRepository.findOneBy({ matricNumber });
   }
 

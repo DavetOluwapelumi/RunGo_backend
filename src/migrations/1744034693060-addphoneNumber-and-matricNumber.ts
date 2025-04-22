@@ -1,14 +1,15 @@
+import { USER_INFORMATION } from "src/constants/tableNames";
 import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
 
 export class AddphoneNumberAndMatricNumber1744034693060 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.addColumn('users', new TableColumn({
+        await queryRunner.addColumn(USER_INFORMATION, new TableColumn({
             name: 'phoneNumber',
             type: 'varchar',
             isNullable: true,
         }));
-        await queryRunner.addColumn('users', new TableColumn({
+        await queryRunner.addColumn(USER_INFORMATION, new TableColumn({
             name: 'matricNumber',
             type: 'varchar',
             isNullable: false,
@@ -16,8 +17,8 @@ export class AddphoneNumberAndMatricNumber1744034693060 implements MigrationInte
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropColumn('users', 'matricNumber');
-        await queryRunner.dropColumn('users', 'phoneNumber');
+        await queryRunner.dropColumn(USER_INFORMATION, 'matricNumber');
+        await queryRunner.dropColumn(USER_INFORMATION, 'phoneNumber');
     }
 
 }
