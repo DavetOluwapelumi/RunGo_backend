@@ -24,7 +24,7 @@ export class OtpEntity {
   @BeforeInsert()
   setDefaults() {
     this.identifier = ulid();
-    this.token = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
+    this.token = Math.floor(100000 + Math.random() * 900000).toString(); 
     this.validityPeriod = Math.floor(Date.now() / 1000) + 300; // 5 minutes from now
   }
 }
