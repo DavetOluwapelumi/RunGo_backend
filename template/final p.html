@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Retrieval</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        .container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container input[type="email"],
+        .container input[type="text"],
+        .container input[type="password"],
+        .container button {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .container button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .container button:hover {
+            background-color: #0056b3;
+        }
+
+        .container .otp-section {
+            display: none; /* Initially hide OTP section */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Account Retrieval</h2>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <button id="sendOtpButton">Send OTP</button>
+
+        <div class="otp-section" id="otpSection">
+            <input type="text" id="otp" placeholder="Enter OTP" required>
+            <input type="password" id="newPassword" placeholder="New Password" required>
+            <button id="verifyOtpButton">Verify OTP and Reset Password</button>
+        </div>
+
+        <p id="message" style="color: red;"></p>
+    </div>
+
+    <script>
+        document.getElementById('sendOtpButton').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                document.getElementById('message').textContent = "Please enter your email.";
+                return;
+            }
+
+            // Simulate sending OTP (replace with your actual backend logic)
+            console.log("Sending OTP to:", email);
+            document.getElementById('otpSection').style.display = 'block';
+            document.getElementById('sendOtpButton').style.display = 'none';
+            document.getElementById('message').textContent = "";
+        });
+
+        document.getElementById('verifyOtpButton').addEventListener('click', function() {
+            const otp = document.getElementById('otp').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            if (!otp || !newPassword) {
+                document.getElementById('message').textContent = "Please enter OTP and new password.";
+                return;
+            }
+
+            // Simulate OTP verification and password reset (replace with your actual backend logic)
+            console.log("Verifying OTP:", otp, "and resetting password");
+            document.getElementById('message').textContent = "Password reset successful!";
+        });
+    </script>
+</body>
+</html>
