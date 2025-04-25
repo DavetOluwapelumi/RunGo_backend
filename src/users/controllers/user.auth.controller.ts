@@ -1,12 +1,10 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   Inject,
   Post,
   Put,
-  Query,
   Request,
 } from '@nestjs/common';
 import { UserAuthService } from '../services/user.auth.service';
@@ -31,21 +29,20 @@ export class UserAuthController {
 
   @Post('login')
   async loginUserUser(@Body() loginUserDTO: LoginUserDTO) {
-  console.log('loginUserDTO', loginUserDTO);
-  return this.userAuthService.login(loginUserDTO);
+    return this.userAuthService.login(loginUserDTO);
   }
 
   @HttpCode(200)
-    @Post('reset-password')
-    async userPasswordReset(@Body() request: RequestPasswordResetDTO) {
-      return this.userAuthService.requestPasswordReset(request);
-    }
+  @Post('reset-password')
+  async userPasswordReset(@Body() request: RequestPasswordResetDTO) {
+    return this.userAuthService.requestPasswordReset(request);
+  }
 
-    @Put('set-password')
-      async userSetNewPassword(
-        @Body() request: SetNewPasswordDTO,
-        @Request() authorizedUser: JwtPayload,
-      ) {
-        return this.userAuthService.setNewPassword(request, authorizedUser);
-      }
+  @Put('set-password')
+  async userSetNewPassword(
+    @Body() request: SetNewPasswordDTO,
+    @Request() authorizedUser: JwtPayload,
+  ) {
+    return this.userAuthService.setNewPassword(request, authorizedUser);
+  }
 }

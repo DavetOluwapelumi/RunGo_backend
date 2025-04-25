@@ -1,6 +1,13 @@
-import { MigrationInterface, QueryRunner, TableColumn, TableForeignKey } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  TableColumn,
+  TableForeignKey,
+} from 'typeorm';
 
-export class AddOtpIdentifierToDriver1744978263384 implements MigrationInterface {
+export class AddOtpIdentifierToDriver1744978263384
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
       'drivers',
@@ -24,9 +31,10 @@ export class AddOtpIdentifierToDriver1744978263384 implements MigrationInterface
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('drivers');
-    const foreignKey = table.foreignKeys.find(fk => fk.columnNames.indexOf('otpIdentifier') !== -1);
+    const foreignKey = table.foreignKeys.find(
+      (fk) => fk.columnNames.indexOf('otpIdentifier') !== -1,
+    );
     await queryRunner.dropForeignKey('drivers', foreignKey);
     await queryRunner.dropColumn('drivers', 'otpIdentifier');
   }
 }
-
