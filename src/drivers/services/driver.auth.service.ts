@@ -37,7 +37,6 @@ export class DriverAuthService {
   private readonly logger = new Logger(DriverAuthService.name);
 
   public async verifyHotlink(link: string) {
-    console.log({ link });
     throw 'inmplemented';
   }
   public async register(request: CreateDriverDTO) {

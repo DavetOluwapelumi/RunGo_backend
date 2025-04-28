@@ -99,7 +99,9 @@ export class UserAuthService {
       );
       console.log('user', user);
       if (!user) {
-        this.logger.error(`User not found for matricNumber: ${request.matricNumber}`);
+        this.logger.error(
+          `User not found for matricNumber: ${request.matricNumber}`,
+        );
         throw new NotFoundException('Invalid matric number or password');
       }
 
