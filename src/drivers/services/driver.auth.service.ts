@@ -114,7 +114,7 @@ export class DriverAuthService {
 
       const jwtPayload: JwtPayload = {
         userEmail: driver.email,
-        userId: driver.id,
+        userId: driver.identifier,
         accountType: 'driver',
       };
 

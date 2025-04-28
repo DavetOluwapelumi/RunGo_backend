@@ -55,5 +55,4 @@ export default class User {
       this.matricNumber = 'RUN/DEPT/DIGITS'; 
     }
   }
-  
 }

@@ -7,9 +7,10 @@ import {
   Post,
   Put,
   Query,
-  Request,
+  Request, NotFoundException, Param
 } from '@nestjs/common';
 import { DriverAuthService } from '../services/driver.auth.service';
+import { DriverService } from '../services/drivers.service';
 import { CreateDriverDTO } from '../dto/createDriver';
 import { LoginDriverDTO } from '../dto/loginDriver';
 import { RequestPasswordResetDTO } from '../dto/requestPasswordReset';
@@ -21,7 +22,30 @@ export class DriverAuthController {
   constructor(
     @Inject(DriverAuthService)
     private readonly driverAuthService: DriverAuthService,
+    @Inject(DriverService)
+    private readonly driverService: DriverService,
   ) {}
+
+
+  @HttpCode(200)
+  @Put('availability/:driverId')
+  async updateDriverAvailability(
+    @Param('driverId') driverId: string,
+    @Body('isAvailable') isAvailable: boolean,
+  ){
+    await this.driverService.updateDriverAvailability(driverId, isAvailable);
+    return { message: `Driver ${driverId} availability updated to ${isAvailable}` };
+  }
+
+  @HttpCode(200)
+  @Get('availability/:driverId')
+  async getDriverAvailability(@Param('driverId') driverId: string) {
+    const driver = await this.driverService.findOneByIdentifier(driverId);
+    if (!driver) {
+      throw new NotFoundException('Driver not found');
+    }
+    return { isAvailable: driver.isAvailable };
+  }
 
   @HttpCode(201)
   @Post('register')

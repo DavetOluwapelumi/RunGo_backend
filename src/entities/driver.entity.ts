@@ -39,7 +39,9 @@ export default class Driver {
 
   @Column()
   isVerified: boolean;
-  id: string;
+
+  @Column({ default: true }) // New column to track availability
+  isAvailable: boolean;
 
   @BeforeInsert()
   async setDefaults() {
@@ -47,5 +49,6 @@ export default class Driver {
     this.dateAdded = new Date();
     this.lastUpdatedAt = new Date();
     this.isVerified = false;
+    this.isAvailable = true; // Default to available when a driver is created
   }
 }

@@ -29,4 +29,13 @@ export class DriverService {
 
     return await this.driverRepository.save(newDriver);
   }
+
+  public async updateDriverAvailability(identifier: string, isAvailable: boolean): Promise<void> {
+    await this.driverRepository.update({ identifier }, { isAvailable });
+  }
+
+  // New method to find an available driver
+  public async findAvailableDriver(): Promise<Driver | null> {
+    return await this.driverRepository.findOne({ where: { isAvailable: true } });
+  }
 }
