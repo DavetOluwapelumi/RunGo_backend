@@ -1,4 +1,11 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BeforeInsert,
+} from 'typeorm';
 import { ulid } from 'ulid';
 
 @Entity('otp')
@@ -6,13 +13,13 @@ export class OtpEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type:'varchar', unique: true, length: 6  })
+  @Column({ type: 'varchar', unique: true, length: 6 })
   identifier: string;
 
   @Column({ type: 'varchar', length: 6 })
   token: string;
 
-  @Column({type: "bigint"})
+  @Column({ type: 'bigint' })
   validityPeriod: number;
 
   @CreateDateColumn()
@@ -24,7 +31,7 @@ export class OtpEntity {
   @BeforeInsert()
   setDefaults() {
     this.identifier = ulid();
-    this.token = Math.floor(100000 + Math.random() * 900000).toString(); 
+    this.token = Math.floor(100000 + Math.random() * 900000).toString();
     this.validityPeriod = Math.floor(Date.now() / 1000) + 300; // 5 minutes from now
   }
 }

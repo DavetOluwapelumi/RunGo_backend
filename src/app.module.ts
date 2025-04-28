@@ -21,11 +21,9 @@ import typeorm from './config/typeorm';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        const config = configService.getOrThrow('typeorm')
-        console.log('config', config)
-        return config
-
-      }
+        const config = configService.getOrThrow('typeorm');
+        return config;
+      },
     }),
     MailerModule.forRoot({
       transport: "smtp://'':''@mailtutan",

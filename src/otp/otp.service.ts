@@ -16,19 +16,20 @@ export class OtpService {
   }
 
   async validateOtp(identifier: string, token: string): Promise<boolean> {
-    const otp = await this.otpRepository.findOne({ where: { identifier, token } });
+    const otp = await this.otpRepository.findOne({
+      where: { identifier, token },
+    });
     if (!otp) {
       return false;
     }
-      const currentTime = Math.floor(Date.now() / 1000);
-      const otpHasExpired = otp.validityPeriod >= currentTime;
-      const invalidToken = otp.token !== token.trim()
+    const currentTime = Math.floor(Date.now() / 1000);
+    const otpHasExpired = otp.validityPeriod >= currentTime;
+    const invalidToken = otp.token !== token.trim();
 
-      if (invalidToken||otpHasExpired){
-      return false;}
+    if (invalidToken || otpHasExpired) {
+      return false;
+    }
 
     return true;
-
   }
-
 }

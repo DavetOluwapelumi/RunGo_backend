@@ -18,7 +18,8 @@ export class UserService {
   }
 
   public async create(payload: CreateUserDTO): Promise<User> {
-    const { email, password, firstName, lastName, phoneNumber, matricNumber } = payload;
+    const { email, password, firstName, lastName, phoneNumber, matricNumber } =
+      payload;
     const newUser = this.userRepository.create();
 
     newUser.email = email;

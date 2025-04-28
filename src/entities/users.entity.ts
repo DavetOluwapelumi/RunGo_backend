@@ -23,9 +23,9 @@ export default class User {
   @Column()
   password: string;
 
-  @Column({ unique: true})
+  @Column({ unique: true })
   matricNumber: string;
-  
+
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
@@ -52,8 +52,7 @@ export default class User {
     this.lastUpdatedAt = new Date();
     this.isVerified = false;
     if (!this.matricNumber) {
-      this.matricNumber = 'RUN/DEPT/DIGITS'; 
+      this.matricNumber = 'RUN/DEPT/DIGITS';
     }
   }
-  
 }
