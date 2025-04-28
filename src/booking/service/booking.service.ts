@@ -78,4 +78,13 @@ export class BookingService {
     }
     await this.bookingRepository.remove(booking);
   }
+
+  public async updateBooking(identifier: string, request: Partial<Booking>): Promise<Booking> {
+    const booking = await this.findBookingByIdentifier(identifier);
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+    Object.assign(booking, request); // Merge the updates into the existing booking
+    return await this.bookingRepository.save(booking);
+  }
 }

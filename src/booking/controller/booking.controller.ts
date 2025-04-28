@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { BookingService } from '../service/booking.service';
 import { CreateBookingDTO } from '../dto/createBooking';
+import { UpdateBookingDTO } from '../dto/updateBooking';
 
 @Controller({ version: '1', path: 'booking' })
 export class BookingController {
@@ -19,26 +20,23 @@ export class BookingController {
     @Inject(BookingService)
     private readonly bookingService: BookingService,
   ) {}
-
+// Create a new booking
   @HttpCode(201)
-  @Post()
+  @Post("Create-booking")
   async createBooking(@Body() request: CreateBookingDTO) {
     const booking = await this.bookingService.createBooking(request);
     return { message: 'Booking created successfully', booking };
   }
-
+// Retrieve all bookings
   @HttpCode(200)
-  @Get()
+  @Get('Retrieve-booking')
   async findAllBooking() {
     return await this.bookingService.findAllBookings();
   }
 
-  @Get()
-  async findBooking() {}
-
-  // Retrieve a specific booking by identifier
+// Retrieve a specific booking by identifier
   @HttpCode(200)
-  @Get('/:identifier')
+  @Get('Retrieve-specific/:identifier')
   async findOneBooking(@Param('identifier') identifier: string) {
     const booking = await this.bookingService.findBookingByIdentifier(identifier);
     if (!booking) {
@@ -46,12 +44,19 @@ export class BookingController {
     }
     return booking;
   }
-
-  @Patch(':/identifier')
-  async updateOneBooking() {}
+// Update a specific booking by identifier
+  @HttpCode(200)
+  @Patch('Update-specific/:identifier')
+  async updateOneBooking(
+    @Param('identifier') identifier: string,
+    @Body() request: UpdateBookingDTO,
+  ) {
+    const updatedBooking = await this.bookingService.updateBooking(identifier, request);
+    return { message: 'Booking updated successfully', updatedBooking };
+  }
 
   @HttpCode(200)
-  @Delete('/:identifier')
+  @Delete('Delete-specific/:identifier')
   async deleteOneBooking(@Param('identifier') identifier: string) {
     await this.bookingService.deleteBooking(identifier);
     return { message: 'Booking deleted successfully' };
