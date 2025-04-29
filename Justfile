@@ -37,3 +37,4 @@ migrate name:
 
 run-migrations:
     npm run typeorm migration:run -d src/datasource.ts
+
