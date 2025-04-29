@@ -21,5 +21,6 @@ import { DriverProfileService } from './services/driver.profile.service';
     DriverAuthController,
     DriverProfileController,
   ],
+  exports: [DriverService],
 })
 export class DriversModule {}
