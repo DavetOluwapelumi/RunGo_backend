@@ -8,7 +8,7 @@ import Payment from '../entities/payment.entity';
 import User from '../entities/users.entity';
 import Car from '../entities/car.entity';
 import { PaymentService } from '../payment/payment.service';
-import { DriversModule } from 'src/drivers/drivers.module'; 
+import { DriversModule } from '../drivers/drivers.module'; 
 
 @Module({
   providers: [BookingService, PaymentService],

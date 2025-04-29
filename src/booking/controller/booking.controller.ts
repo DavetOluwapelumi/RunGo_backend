@@ -30,8 +30,8 @@ export class BookingController {
 // Retrieve all bookings
   @HttpCode(200)
   @Get('Retrieve-booking')
-  async findAllBooking() {
-    return await this.bookingService.findAllBookings();
+  async findAllBooking(@Param('userId') userId: string) {
+    return await this.bookingService.findAllBookings(userId);
   }
 
 // Retrieve a specific booking by identifier

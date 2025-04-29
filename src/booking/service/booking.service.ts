@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Booking from '../../entities/booking.entity';
 import { Repository } from 'typeorm';
@@ -31,7 +31,7 @@ export class BookingService {
 
       const availableDriver = await this.driverService.findAvailableDriver();
       if (!availableDriver) {
-        throw new NotFoundException('No available drivers at the moment.');
+        throw new UnprocessableEntityException('No available drivers at the moment.');
       }
 
       await this.driverService.updateDriverAvailability(availableDriver.identifier, false);
@@ -62,10 +62,12 @@ export class BookingService {
       throw error;
     }
   }
-
-  public async findAllBookings(): Promise<Booking[]> {
-    return await this.bookingRepository.find();
+  public async findAllBookings(userId: string): Promise<Booking[]> {
+    return await this.bookingRepository.find({
+      where: { userIdentifier: userId },
+    });
   }
+  
 
   public async findBookingByIdentifier(identifier: string): Promise<Booking | null> {
     return await this.bookingRepository.findOne({ where: { identifier } });

@@ -49,6 +49,6 @@ export default class Driver {
     this.dateAdded = new Date();
     this.lastUpdatedAt = new Date();
     this.isVerified = false;
-    this.isAvailable = true; // Default to available when a driver is created
+    this.isAvailable = false; // Default to available when a driver is created
   }
 }

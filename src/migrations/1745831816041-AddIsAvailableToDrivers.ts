@@ -7,7 +7,7 @@ export class AddIsAvailableToDrivers1745831816041 implements MigrationInterface 
       new TableColumn({
         name: 'isAvailable',
         type: 'boolean',
-        default: true,
+        default: false,
       }),
     );
   }
