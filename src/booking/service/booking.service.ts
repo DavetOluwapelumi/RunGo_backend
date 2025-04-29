@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateBookingDTO } from '../dto/createBooking';
 import { PaymentService } from '../../payment/payment.service';
 import { CreatePaymentDTO } from '../../payment/dto/createPayment';
-import { DriverService } from 'src/drivers/services/drivers.service';
+import { DriverService } from '../../drivers/services/drivers.service';
 
 @Injectable()
 export class BookingService {
