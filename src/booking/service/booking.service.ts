@@ -15,9 +15,13 @@ export class BookingService {
     @Inject(PaymentService)
     private readonly paymentService: PaymentService,
     private readonly driverService: DriverService,
-  ) {}
+  ) { }
 
   public async createBooking(request: CreateBookingDTO) {
+    const availableDriver = await this.driverService.findAvailableDriver();
+    if (!availableDriver) {
+      throw new UnprocessableEntityException('No available drivers at the moment.');
+    }
     try {
       const {
         userIdentifier,
@@ -29,10 +33,7 @@ export class BookingService {
         paymentMethod,
       } = request;
 
-      const availableDriver = await this.driverService.findAvailableDriver();
-      if (!availableDriver) {
-        throw new UnprocessableEntityException('No available drivers at the moment.');
-      }
+
 
       await this.driverService.updateDriverAvailability(availableDriver.identifier, false);
 
@@ -45,9 +46,7 @@ export class BookingService {
 
       const { identifier: paymentIdentifier } = await this.paymentService
         .createPayment(paymentDto)
-        .catch((error) => {
-          throw error;
-        });
+
 
       const booking = this.bookingRepository.create();
       booking.destination = destination;
@@ -59,6 +58,7 @@ export class BookingService {
 
       return savedBooking;
     } catch (error) {
+      await this.driverService.updateDriverAvailability(availableDriver.identifier, true);
       throw error;
     }
   }
@@ -67,7 +67,7 @@ export class BookingService {
       where: { userIdentifier: userId },
     });
   }
-  
+
 
   public async findBookingByIdentifier(identifier: string): Promise<Booking | null> {
     return await this.bookingRepository.findOne({ where: { identifier } });

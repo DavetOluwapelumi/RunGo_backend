@@ -21,7 +21,7 @@ export class DriverAvailabilityController {
   ) {}
   
   @HttpCode(200)
-  @Put('availability/:driverId')
+  @Put(':driverId')
   async updateDriverAvailability(
     @Param('driverId') driverId: string,
     @Body('isAvailable') isAvailable: boolean,
@@ -30,8 +30,14 @@ export class DriverAvailabilityController {
     return { message: `Driver ${driverId} availability updated to ${isAvailable}` };
   }
 
+  
+  @Get('/all')
+  getAllAvailableDrivers() {
+    return this.driverService.findAllAvailableDrivers();
+  }
+
   @HttpCode(200)
-  @Get('availability/:driverId')
+  @Get(':driverId')
   async getDriverAvailability(@Param('driverId') driverId: string) {
     const driver = await this.driverService.findOneByIdentifier(driverId);
     if (!driver) {
@@ -39,5 +45,6 @@ export class DriverAvailabilityController {
     }
     return { isAvailable: driver.isAvailable };
   }
+
 
 }
