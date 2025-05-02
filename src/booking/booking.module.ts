@@ -8,14 +8,15 @@ import Payment from '../entities/payment.entity';
 import User from '../entities/users.entity';
 import Car from '../entities/car.entity';
 import { PaymentService } from '../payment/payment.service';
-import { DriversModule } from '../drivers/drivers.module'; 
+import { DriversModule } from '../drivers/drivers.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   providers: [BookingService, PaymentService],
   controllers: [BookingController],
   imports: [
     TypeOrmModule.forFeature([Booking, Payment, User, Car]),
-    PaymentModule, DriversModule,
+    PaymentModule, DriversModule, UsersModule,
   ],
 })
-export class BookingModule {}
+export class BookingModule { }

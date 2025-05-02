@@ -42,8 +42,8 @@ export default class User {
   isVerified: boolean;
   id: string;
 
-  @Column({ nullable: true })
-  otpIdentifier: string;
+  // @Column({ nullable: true })
+  // otpIdentifier: string;
 
   @BeforeInsert()
   async setDefaults() {

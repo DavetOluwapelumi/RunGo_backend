@@ -20,6 +20,7 @@ export class DriverAvailabilityController {
     private readonly driverService: DriverService,
   ) {}
   
+  // Update driver availability
   @HttpCode(200)
   @Put(':driverId')
   async updateDriverAvailability(
@@ -30,7 +31,7 @@ export class DriverAvailabilityController {
     return { message: `Driver ${driverId} availability updated to ${isAvailable}` };
   }
 
-  
+  // Return all available drivers
   @Get('/all')
   getAllAvailableDrivers() {
     return this.driverService.findAllAvailableDrivers();

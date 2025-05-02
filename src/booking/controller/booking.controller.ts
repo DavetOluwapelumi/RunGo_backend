@@ -20,9 +20,10 @@ export class BookingController {
     @Inject(BookingService)
     private readonly bookingService: BookingService,
   ) {}
+
 // Create a new booking
   @HttpCode(201)
-  @Post("Create-booking")
+  @Post("createBooking")
   async createBooking(@Body() request: CreateBookingDTO) {
     const booking = await this.bookingService.createBooking(request);
     return { message: 'Booking created successfully', booking };
@@ -61,4 +62,11 @@ export class BookingController {
     await this.bookingService.deleteBooking(identifier);
     return { message: 'Booking deleted successfully' };
   }
+
+  @HttpCode(200)
+@Patch('endTrip/:identifier')
+async endTrip(@Param('identifier') identifier: string) {
+  const booking = await this.bookingService.endTrip(identifier);
+  return { message: 'Trip ended successfully', booking };
+}
 }

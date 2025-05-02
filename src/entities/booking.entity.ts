@@ -1,3 +1,5 @@
+import { time } from 'console';
+import { timestamp } from 'rxjs';
 import { BOOKING_INFORMATION } from 'src/constants/tableNames';
 import { BookingStatus } from 'src/enums/bookingStatus';
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
@@ -23,10 +25,10 @@ export default class Booking {
   @Column()
   destination: string;
 
-  @Column()
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   pickupTime: Date;
 
-  @Column()
+  @Column({ type: 'timestamp', nullable: true })
   dropoffTime: Date;
 
   @Column({
