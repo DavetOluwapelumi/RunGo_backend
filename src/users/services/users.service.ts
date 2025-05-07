@@ -14,7 +14,7 @@ export class UserService {
   }
 
   public async findOneByIdentifier(identifier: string): Promise<User> {
-    return await this.userRepository.findOneBy({ identifier });
+    return await this.userRepository.findOneBy({ matricNumber: identifier });
   }
 
   public async create(payload: CreateUserDTO): Promise<User> {

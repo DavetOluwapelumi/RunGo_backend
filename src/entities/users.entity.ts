@@ -26,6 +26,9 @@ export default class User {
   @Column({ unique: true })
   matricNumber: string;
 
+  @Column({ type: "boolean", default: false })
+  isStudent: boolean;
+
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',

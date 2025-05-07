@@ -34,7 +34,7 @@ export default class Booking {
   @Column({
     type: 'enum',
     enum: Object.values(BookingStatus),
-    default: `'${BookingStatus.PENDING}'`,
+    default: BookingStatus.PENDING,
   })
   status: string;
 

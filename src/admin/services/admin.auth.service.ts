@@ -31,7 +31,7 @@ export class AdminAuthService {
     private readonly adminService: AdminService,
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
-  ) {}
+  ) { }
 
   private readonly logger = new Logger(AdminAuthService.name);
 
@@ -106,6 +106,7 @@ export class AdminAuthService {
         userEmail: admin.email,
         userId: admin.identifier,
         accountType: 'admin',
+        isStudent: false,
       };
       const jwtToken = await this.commonAuthService
         .generateJwt(jwtPayload)

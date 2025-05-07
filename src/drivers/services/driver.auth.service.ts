@@ -32,7 +32,7 @@ export class DriverAuthService {
     private readonly driverService: DriverService,
     @InjectRepository(Driver)
     private readonly driverRepository: Repository<Driver>,
-  ) {}
+  ) { }
 
   private readonly logger = new Logger(DriverAuthService.name);
 
@@ -115,6 +115,7 @@ export class DriverAuthService {
         userEmail: driver.email,
         userId: driver.identifier,
         accountType: 'driver',
+        isStudent: false,
       };
 
       const jwtToken = await this.commonAuthService

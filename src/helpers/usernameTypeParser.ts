@@ -1,9 +1,9 @@
-function validateInput(inputString: string, inputType: 'phone' | 'email' | 'matric'): string {
+export function validateInput(inputString: string, inputType: 'phone' | 'email' | 'matric'): string {
     // Define regex patterns
     const patterns: { [key: string]: RegExp } = {
         phone: /^\+?1?\d{9,15}$/,  // Example for international phone numbers
-        email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        matric: /^[A-Z]{3}\/[A-Z]{3}\/\d{2}\/\d{5}$/  // Updated pattern for matric numbers (e.g., RUN/CMP/21/10833)
+        email: /^[a-zA-Z]+[0-9]{5}@run\.edu\.ng$/,  // Updated pattern for emails ending with @run.edu.ng
+        matric: /^RUN\/[A-Z]{3}\/\d{2}\/\d{5}$/  // Updated pattern for matric numbers (e.g., RUN/CMP/21/10833)
     };
 
     // Check if the input type is valid
@@ -19,7 +19,3 @@ function validateInput(inputString: string, inputType: 'phone' | 'email' | 'matr
     }
 }
 
-// Example usage
-console.log(validateInput("+1234567890", "phone"));
-console.log(validateInput("example@example.com", "email"));
-console.log(validateInput("RUN/CMP/21/10833", "matric"));  // This will now be valid
