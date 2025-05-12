@@ -3,7 +3,7 @@ import { DriverService } from 'src/drivers/services/drivers.service';
 import Driver from 'src/entities/driver.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateDriverDTO } from 'src/drivers/dto/createDriver';
+import { CreateDriverDTO } from '../../drivers/dto/createDriver';
 
 @Injectable()
 export class AdminDriverService {

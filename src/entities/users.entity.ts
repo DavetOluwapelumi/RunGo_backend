@@ -45,6 +45,9 @@ export default class User {
   isVerified: boolean;
   id: string;
 
+  @Column({ type: "boolean", default: true }) // Add isActive property
+  isActive: boolean;
+
   // @Column({ nullable: true })
   // otpIdentifier: string;
 
