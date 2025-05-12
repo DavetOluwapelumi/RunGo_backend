@@ -43,6 +43,12 @@ export default class Driver {
   @Column({ default: true }) // New column to track availability
   isAvailable: boolean;
 
+  @Column({ type: 'int', default: 0 }) // New column to track completed rides
+  completedRides: number;
+
+  @Column({ type: 'float', default: 0 }) // New column to track average rating
+  averageRating: number;
+
   @BeforeInsert()
   async setDefaults() {
     this.identifier = ulid();
