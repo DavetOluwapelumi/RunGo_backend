@@ -51,7 +51,8 @@ export default class User {
 
   // @Column({ nullable: true })
   // otpIdentifier: string;
-  @OneToMany(() => Booking, (booking) => booking.user) // Define the relation
+
+  @OneToMany(() => Booking, (booking) => booking.identifier)
   bookings: Booking[];
 
   @BeforeInsert()

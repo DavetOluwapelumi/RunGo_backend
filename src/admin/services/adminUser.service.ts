@@ -11,8 +11,13 @@ export class AdminUserService {
     private readonly userService: UserService, // Import UserService for shared logic
     @InjectRepository(User)
     private readonly userRepository: Repository<User>, // For admin-specific operations
+    @InjectRepository(Booking)
+    private readonly bookingRepository: Repository<Booking>, // For booking-specific operations
   ) { }
 
+  onModuleInit() {
+    console.log('BookingRepository:', this.bookingRepository); // Log BookingRepository to verify it is resolved
+  }
   // View all users
   public async getAllUsers(): Promise<User[]> {
     return await this.userRepository.find();
@@ -48,17 +53,17 @@ export class AdminUserService {
     await this.userRepository.remove(user);
   }
 
+  // TODO: Get user booking history
   public async getUserBookingHistory(identifier: string): Promise<Booking[]> {
-    const user = await this.userRepository.findOne({
-      where: { identifier },
-      relations: ['bookings'], // Include the bookings relation
+    const bookings = await this.bookingRepository.find({
+      where: { userIdentifier: identifier }, // Query by userIdentifier
     });
 
-    if (!user) {
-      throw new NotFoundException('User not found');
+    if (!bookings.length) {
+      throw new NotFoundException('No bookings found for this user');
     }
 
-    return user.bookings; // Return the user's bookings
+    return bookings;
   }
 
   // Reset user password

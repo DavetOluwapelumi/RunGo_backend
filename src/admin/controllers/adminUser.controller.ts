@@ -30,11 +30,11 @@ export class UserAdminController {
         return new ApiResponse('User deleted successfully', null);
     }
 
-    @Get(':identifier/bookings')
-    public async getUserBookingHistory(@Param('identifier') identifier: string): Promise<ApiResponse<any[]>> {
-        const bookings = await this.userAdminService.getUserBookingHistory(identifier);
-        return new ApiResponse('User booking history fetched successfully', bookings);
-    }
+    // @Get(':identifier/bookings')
+    // public async getUserBookingHistory(@Param('identifier') identifier: string): Promise<ApiResponse<any[]>> {
+    //     const bookings = await this.userAdminService.getUserBookingHistory(identifier);
+    //     return new ApiResponse('User booking history fetched successfully', bookings);
+    // }
 
     @Patch(':identifier/resetPassword')
     public async resetUserPassword(

@@ -51,8 +51,9 @@ export default class Booking {
   })
   lastUpdatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.bookings, { onDelete: 'CASCADE' }) // Define the relationship
-  user: User;
+  // @ManyToOne(() => User, (user) => user.bookings, { onDelete: 'CASCADE' }) // Add the relationship
+  // user: User;
+
   @BeforeInsert()
   private async setIdentifier() {
     this.identifier = ulid();

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonAuthService } from 'src/auth/auth.service.common';
 import { Admin } from '../entities/admin.entity';
@@ -16,6 +16,8 @@ import { AdminUserService } from './services/adminUser.service';
 import { UserService } from '../users/services/users.service';
 import User from '../entities/users.entity';
 import { UserAdminController } from './controllers/adminUser.controller';
+import { BookingModule } from '../booking/booking.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   providers: [
@@ -25,7 +27,7 @@ import { UserAdminController } from './controllers/adminUser.controller';
     AdminProfileService,
     AdminDriverService, UserService, AdminUserService
   ],
-  imports: [TypeOrmModule.forFeature([User]), TypeOrmModule.forFeature([Admin]), TypeOrmModule.forFeature([Driver]), DriversModule],
+  imports: [forwardRef(() => UsersModule), TypeOrmModule.forFeature([User]), TypeOrmModule.forFeature([Admin]), TypeOrmModule.forFeature([Driver]), BookingModule, DriversModule],
   controllers: [AdminController, AdminAuthController, AdminProfileController, AdminDriverController, UserAdminController],
   exports: [AdminUserService, UserService],
 })
