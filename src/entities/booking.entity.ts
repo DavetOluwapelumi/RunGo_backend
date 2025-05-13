@@ -2,8 +2,9 @@ import { time } from 'console';
 import { timestamp } from 'rxjs';
 import { BOOKING_INFORMATION } from 'src/constants/tableNames';
 import { BookingStatus } from 'src/enums/bookingStatus';
-import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryColumn, ManyToOne } from 'typeorm';
 import { ulid } from 'ulid';
+import User from './users.entity';
 
 @Entity(BOOKING_INFORMATION)
 export default class Booking {
@@ -50,6 +51,8 @@ export default class Booking {
   })
   lastUpdatedAt: Date;
 
+  @ManyToOne(() => User, (user) => user.bookings, { onDelete: 'CASCADE' }) // Define the relationship
+  user: User;
   @BeforeInsert()
   private async setIdentifier() {
     this.identifier = ulid();

@@ -12,9 +12,10 @@ import { AdminDriverService } from './services/adminDriver.service';
 import { AdminDriverController } from './controllers/adminDriver.controller';
 import Driver from 'src/entities/driver.entity';
 import { DriversModule } from 'src/drivers/drivers.module';
-// import { UserAdminService } from './services/adminUser.service';
+import { AdminUserService } from './services/adminUser.service';
 import { UserService } from '../users/services/users.service';
 import User from '../entities/users.entity';
+import { UserAdminController } from './controllers/adminUser.controller';
 
 @Module({
   providers: [
@@ -22,10 +23,11 @@ import User from '../entities/users.entity';
     CommonAuthService,
     AdminAuthService,
     AdminProfileService,
-    AdminDriverService, UserService
+    AdminDriverService, UserService, AdminUserService
   ],
   imports: [TypeOrmModule.forFeature([User]), TypeOrmModule.forFeature([Admin]), TypeOrmModule.forFeature([Driver]), DriversModule],
-  controllers: [AdminController, AdminAuthController, AdminProfileController, AdminDriverController],
-  // exports: [UserAdminService],
+  controllers: [AdminController, AdminAuthController, AdminProfileController, AdminDriverController, UserAdminController],
+  exports: [AdminUserService, UserService],
 })
+
 export class AdminModule { }
