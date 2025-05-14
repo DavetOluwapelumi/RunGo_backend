@@ -32,7 +32,7 @@ export class DriverAuthService {
     private readonly driverService: DriverService,
     @InjectRepository(Driver)
     private readonly driverRepository: Repository<Driver>,
-  ) { }
+  ) {}
 
   private readonly logger = new Logger(DriverAuthService.name);
 

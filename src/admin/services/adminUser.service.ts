@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { UserService } from 'src/users/services/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import User from '../../entities/users.entity';
@@ -15,9 +19,6 @@ export class AdminUserService {
     private readonly bookingRepository: Repository<Booking>, // For booking-specific operations
   ) { }
 
-  onModuleInit() {
-    console.log('BookingRepository:', this.bookingRepository); // Log BookingRepository to verify it is resolved
-  }
   // View all users
   public async getAllUsers(): Promise<User[]> {
     return await this.userRepository.find();
@@ -67,7 +68,10 @@ export class AdminUserService {
   }
 
   // Reset user password
-  public async resetUserPassword(identifier: string, newPassword: string): Promise<void> {
+  public async resetUserPassword(
+    identifier: string,
+    newPassword: string,
+  ): Promise<void> {
     const user = await this.userService.findOneByIdentifier(identifier);
     if (!user) {
       throw new NotFoundException('User not found');

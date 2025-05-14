@@ -9,7 +9,6 @@ import { JwtModule } from '@nestjs/jwt';
   providers: [CommonAuthService],
   exports: [CommonAuthService],
   imports: [
-    AdminModule,
     JwtModule.register({
       global: true,
       secret: JWT_SECRET,
@@ -17,4 +16,4 @@ import { JwtModule } from '@nestjs/jwt';
     }),
   ],
 })
-export class AuthModule {}
+export class AuthModule { }

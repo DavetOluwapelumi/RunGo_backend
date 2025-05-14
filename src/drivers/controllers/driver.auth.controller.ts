@@ -7,7 +7,9 @@ import {
   Post,
   Put,
   Query,
-  Request, NotFoundException, Param
+  Request,
+  NotFoundException,
+  Param,
 } from '@nestjs/common';
 import { DriverAuthService } from '../services/driver.auth.service';
 import { DriverService } from '../services/drivers.service';
@@ -26,7 +28,6 @@ export class DriverAuthController {
     private readonly driverService: DriverService,
   ) {}
 
-  
   @HttpCode(201)
   @Post('register')
   async createDriverUser(@Body() request: CreateDriverDTO) {

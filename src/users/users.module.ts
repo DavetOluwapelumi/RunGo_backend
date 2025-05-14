@@ -7,13 +7,6 @@ import { UserAuthService } from './services/user.auth.service';
 import User from '../entities/users.entity';
 import { AuthModule } from '../auth/auth.module';
 
-import { AdminModule } from '../admin/admin.module';
-
-@Module({
-  imports: [forwardRef(() => AdminModule), TypeOrmModule.forFeature([User])], // Use forwardRef to resolve circular dependency
-  providers: [UserService],
-  exports: [UserService],
-})
 
 @Module({
   providers: [UserService, UserAuthService],

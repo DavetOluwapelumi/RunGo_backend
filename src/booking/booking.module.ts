@@ -15,9 +15,12 @@ import { AdminModule } from '../admin/admin.module';
 @Module({
   providers: [BookingService, PaymentService],
   controllers: [BookingController],
-  imports: [forwardRef(() => AdminModule),
-  TypeOrmModule.forFeature([Booking, Payment, User, Car]),
-    PaymentModule, DriversModule, UsersModule,
+  imports: [
+    forwardRef(() => AdminModule),
+    TypeOrmModule.forFeature([Booking, Payment, User, Car]),
+    PaymentModule,
+    DriversModule,
+    UsersModule,
   ],
 })
-export class BookingModule { }
+export class BookingModule {}

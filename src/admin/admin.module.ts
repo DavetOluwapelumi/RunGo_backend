@@ -18,6 +18,7 @@ import User from '../entities/users.entity';
 import { UserAdminController } from './controllers/adminUser.controller';
 import { BookingModule } from '../booking/booking.module';
 import { UsersModule } from '../users/users.module';
+import Booking from 'src/entities/booking.entity';
 
 @Module({
   providers: [
@@ -25,11 +26,23 @@ import { UsersModule } from '../users/users.module';
     CommonAuthService,
     AdminAuthService,
     AdminProfileService,
-    AdminDriverService, UserService, AdminUserService
+    AdminDriverService,
+    UserService,
+    AdminUserService,
   ],
-  imports: [forwardRef(() => UsersModule), TypeOrmModule.forFeature([User]), TypeOrmModule.forFeature([Admin]), TypeOrmModule.forFeature([Driver]), BookingModule, DriversModule],
-  controllers: [AdminController, AdminAuthController, AdminProfileController, AdminDriverController, UserAdminController],
+  imports: [
+    UsersModule,
+    TypeOrmModule.forFeature([User, Admin, Driver, Booking]),
+    BookingModule,
+    DriversModule,
+  ],
+  controllers: [
+    AdminController,
+    AdminAuthController,
+    AdminProfileController,
+    AdminDriverController,
+    UserAdminController,
+  ],
   exports: [AdminUserService, UserService],
 })
-
 export class AdminModule { }

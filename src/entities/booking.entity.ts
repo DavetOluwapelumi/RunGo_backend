@@ -2,7 +2,13 @@ import { time } from 'console';
 import { timestamp } from 'rxjs';
 import { BOOKING_INFORMATION } from 'src/constants/tableNames';
 import { BookingStatus } from 'src/enums/bookingStatus';
-import { BeforeInsert, Column, Entity, PrimaryColumn, ManyToOne } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  PrimaryColumn,
+  ManyToOne,
+} from 'typeorm';
 import { ulid } from 'ulid';
 import User from './users.entity';
 
