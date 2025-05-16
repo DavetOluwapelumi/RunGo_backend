@@ -1,6 +1,7 @@
 import { DRIVERS_INFORMATION } from 'src/constants/tableNames';
-import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryColumn, OneToOne } from 'typeorm';
 import { ulid } from 'ulid';
+import Car from './car.entity';
 
 @Entity(DRIVERS_INFORMATION)
 export default class Driver {
@@ -48,6 +49,9 @@ export default class Driver {
 
   @Column({ type: 'float', default: 0 }) // New column to track average rating
   averageRating: number;
+
+  @OneToOne(() => Car, (car) => car.driver) // One-to-One relationship
+  car: Car;
 
   @BeforeInsert()
   async setDefaults() {
