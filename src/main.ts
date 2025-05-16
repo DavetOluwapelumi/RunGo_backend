@@ -16,7 +16,11 @@ async function bootstrap() {
   app.use(compression());
   app.use(helmet());
   app.enableCors();
-  app.useGlobalPipes(new ValidationPipe());
+  app.use((req, res, next) => {
+    console.log('Incoming request:', req.method, req.url);
+    next();
+  });
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableVersioning({
     type: VersioningType.URI,
   });
