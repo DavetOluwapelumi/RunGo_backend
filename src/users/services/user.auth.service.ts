@@ -38,19 +38,59 @@ export class UserAuthService {
 
   public async register(request: CreateUserDTO) {
     const {
+      isStudent,
       email,
       phoneNumber,
       firstName,
       lastName,
       password: rawPassword,
+      matricNumber,
     } = request;
+
     try {
+      // Check if the email already exists
       const existingUser = await this.userService.findOneByEmail(email);
       if (existingUser) {
-        throw new ConflictException(
-          'A user with this email or phone already exists.',
+        throw new ConflictException('A user with this email already exists.');
+      }
+
+      // Additional validation for students
+      if (isStudent && !matricNumber) {
+        throw new BadRequestException(
+          'Matric number is required for students.',
         );
       }
+
+      // Hash the password
+      const hashedPassword = await this.commonAuthService
+        .hashPassword(rawPassword)
+        .catch((error) => {
+          this.logger.error(`Error hashing password: ${error.message}`);
+          throw new InternalServerErrorException(
+            'The request could not be completed',
+          );
+        });
+
+      // Create the payload
+      const payload: CreateUserDTO = {
+        isStudent, // Explicitly set isStudent
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        matricNumber: isStudent ? matricNumber : null, // Only set matricNumber for students
+        password: hashedPassword,
+      };
+
+      // Save the user
+      await this.userService.create(payload).catch((error) => {
+        this.logger.error(`Error creating user: ${error.message}`);
+        throw new InternalServerErrorException(
+          'The request could not be completed',
+        );
+      });
+
+      return new ApiResponse('User account successfully created', null);
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'status' in error) {
         const err = error as { status: number; message: string };
@@ -63,77 +103,55 @@ export class UserAuthService {
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-
-    const hashedPassword = await this.commonAuthService
-      .hashPassword(rawPassword)
-      .catch((error) => {
-        this.logger.error(`Error hashing password: ${error.message}`);
-        throw new InternalServerErrorException(
-          'The request could not be completed',
-        );
-      });
-
-    const payload: CreateUserDTO = {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      matricNumber: request.matricNumber,
-      password: hashedPassword,
-    };
-
-    await this.userService.create(payload).catch((error) => {
-      this.logger.error(`Error creating user: ${error.message}`);
-      throw new InternalServerErrorException(
-        'The request could not be completed',
-      );
-    });
-
-    return new ApiResponse('User account successfully created', null);
   }
 
   public async login(request: LoginUserDTO) {
+    const { isStudent, matricNumber, email, password } = request;
+
     try {
-      const user = await this.userService.findOneByIdentifier(
-        request.matricNumber,
-      );
-      console.log('user', user);
-      if (!user) {
-        this.logger.error(
-          `User not found for matricNumber: ${request.matricNumber}`,
-        );
-        throw new NotFoundException('Invalid matric number or password');
+      let user: User;
+
+      if (isStudent) {
+        if (!matricNumber) {
+          throw new BadRequestException(
+            'Matric number is required for students.',
+          );
+        }
+        user = await this.userService.findOneByIdentifier(matricNumber);
+      } else {
+        if (!email) {
+          throw new BadRequestException('Email is required for non-students.');
+        }
+        user = await this.userService.findOneByEmail(email);
       }
 
-      const isCorrectPassword = await this.commonAuthService
-        .validatePasswordHash(user.password, request.password)
-        .catch((error) => {
-          this.logger.error(error.message);
-          throw error;
-        });
+      if (!user) {
+        throw new NotFoundException('Invalid credentials.');
+      }
+
+      const isCorrectPassword =
+        await this.commonAuthService.validatePasswordHash(
+          user.password,
+          password,
+        );
 
       if (!isCorrectPassword) {
-        throw new UnauthorizedException('Invalid email/phone or password');
+        throw new UnauthorizedException('Invalid credentials.');
       }
 
       const jwtPayload: JwtPayload = {
-        userEmail: user.email,
         userId: user.id,
+        userEmail: user.email,
+        isStudent: user.isStudent,
         accountType: 'user',
       };
 
-      const jwtToken = await this.commonAuthService
-        .generateJwt(jwtPayload)
-        .catch((error) => {
-          throw error;
-        });
+      const jwtToken = await this.commonAuthService.generateJwt(jwtPayload);
 
       return new ApiResponse('Login successful', { jwtToken });
     } catch (error) {
       throw new HttpException(
-        typeof error === 'object' && error !== null && 'message' in error
-          ? (error as any).message
-          : 'An unexpected error occurred',
+        error instanceof Error ? error.message : 'An unexpected error occurred',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }

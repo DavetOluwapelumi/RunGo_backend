@@ -17,9 +17,8 @@ import { JwtPayload } from 'src/interfaces/jwt';
 @Controller({ version: '1', path: 'user/auth' })
 export class UserAuthController {
   constructor(
-    @Inject(UserAuthService)
     private readonly userAuthService: UserAuthService,
-  ) {}
+  ) { }
 
   @HttpCode(201)
   @Post('register')

@@ -8,6 +8,7 @@ import { DriverService } from './services/drivers.service';
 import Driver from 'src/entities/driver.entity';
 import { DriversController } from './controllers/drivers.controller';
 import { DriverProfileService } from './services/driver.profile.service';
+import { DriverAvailabilityController } from './controllers/drivers.availability.controller';
 @Module({
   providers: [
     DriverService,
@@ -20,6 +21,7 @@ import { DriverProfileService } from './services/driver.profile.service';
     DriversController,
     DriverAuthController,
     DriverProfileController,
+    DriverAvailabilityController,
   ],
   exports: [DriverService],
 })

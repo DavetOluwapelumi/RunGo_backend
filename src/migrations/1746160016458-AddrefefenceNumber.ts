@@ -1,20 +1,20 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
-export class AddIsAvailableToDrivers1745831816041
+export class AddReferenceNumberToPayment1746160016458
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumn(
-      'drivers',
+      'payment',
       new TableColumn({
-        name: 'isAvailable',
-        type: 'boolean',
-        default: false,
+        name: 'referenceNumber',
+        type: 'varchar',
+        isNullable: false,
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropColumn('drivers', 'isAvailable');
+    await queryRunner.dropColumn('payment', 'referenceNumber');
   }
 }

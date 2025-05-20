@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { DataSource } from 'typeorm';
-import { dataSourceOptions } from './config/typeorm';
+import { dataSourceOptions } from './config/typeorm.config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports

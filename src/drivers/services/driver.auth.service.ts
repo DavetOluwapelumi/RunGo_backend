@@ -115,6 +115,7 @@ export class DriverAuthService {
         userEmail: driver.email,
         userId: driver.identifier,
         accountType: 'driver',
+        isStudent: false,
       };
 
       const jwtToken = await this.commonAuthService

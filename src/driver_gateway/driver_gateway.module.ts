@@ -4,6 +4,6 @@ import { DriversModule } from '../drivers/drivers.module';
 
 @Module({
   imports: [DriversModule],
-  providers: [DriverGatewayGateway]
+  providers: [DriverGatewayGateway],
 })
 export class DriverGatewayModule {}
