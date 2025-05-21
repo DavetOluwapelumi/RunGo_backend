@@ -6,8 +6,8 @@ export const mailerConfig: MailerOptions = {
   transport: "smtp://'':''@mailtutan",
   defaults: {
     from: '"Run.go" <admin@run.go>',
-    host: 'mailtutan',
-    port: 1025,
+    host: 'http://smtp.gmail.com',
+    port: 465,
     auth: {
       user: '',
       pass: '',
