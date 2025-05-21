@@ -15,7 +15,7 @@ export default class Car {
   carModel: string;
 
   @Column()
-  carYear: number;
+  capacity: number;
 
   @Column()
   carColor: string;
@@ -29,6 +29,12 @@ export default class Car {
   @Column()
   driverIdentifier: string;
 
+  @Column()
+  isVerified: boolean;
+
+  @Column()
+  availabilityStatus: string;
+
   @OneToOne(() => Driver, (driver) => driver.car, { onDelete: 'SET NULL' }) // One-to-One relationship
   @JoinColumn()
   driver: Driver;
@@ -39,6 +45,8 @@ export default class Car {
   })
   dateAdded: Date;
 
+
+
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
@@ -48,5 +56,6 @@ export default class Car {
   @BeforeInsert()
   async setIdentifier() {
     this.identifier = ulid();
+    this.isVerified = false;
   }
 }

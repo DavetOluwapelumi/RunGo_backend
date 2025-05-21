@@ -19,6 +19,10 @@ import { UserAdminController } from './controllers/adminUser.controller';
 import { BookingModule } from '../booking/booking.module';
 import { UsersModule } from '../users/users.module';
 import Booking from 'src/entities/booking.entity';
+import { CarModule } from 'src/car/car.module';
+import { AdminCarService } from './services/adminCar.service';
+import Car from 'src/entities/car.entity';
+import { AdminCarController } from './controllers/adminCar.controller';
 
 @Module({
   providers: [
@@ -29,12 +33,14 @@ import Booking from 'src/entities/booking.entity';
     AdminDriverService,
     UserService,
     AdminUserService,
+    AdminCarService,
   ],
   imports: [
     UsersModule,
-    TypeOrmModule.forFeature([User, Admin, Driver, Booking]),
+    TypeOrmModule.forFeature([User, Admin, Driver, Booking, Car]),
     BookingModule,
     DriversModule,
+    CarModule,
   ],
   controllers: [
     AdminController,
@@ -42,6 +48,7 @@ import Booking from 'src/entities/booking.entity';
     AdminProfileController,
     AdminDriverController,
     UserAdminController,
+    AdminCarController,
   ],
   exports: [AdminUserService, UserService],
 })

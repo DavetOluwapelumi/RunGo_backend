@@ -76,7 +76,7 @@ export class AdminUserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    user.password = newPassword; // Ideally, hash the password before saving
+    user.password = newPassword; 
     await this.userRepository.save(user);
   }
 }
