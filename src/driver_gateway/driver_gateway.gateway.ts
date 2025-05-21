@@ -11,14 +11,16 @@ import { Server, Socket } from 'socket.io';
 import { DriverService } from 'src/drivers/services/drivers.service';
 
 @WebSocketGateway()
-export class DriverGatewayGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class DriverGatewayGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
   constructor(private readonly driverService: DriverService) {}
 
   // Handle client connection
-   async handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     const driverId = client.handshake.query.driverId as string; // Assume driverId is passed in the query params
     if (driverId) {
       await this.driverService.updateDriverAvailability(driverId, true); // Mark driver as available
@@ -35,7 +37,10 @@ export class DriverGatewayGateway implements OnGatewayConnection, OnGatewayDisco
 
   // Handle custom event (e.g., 'message')
   @SubscribeMessage('message')
-  handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: any): string {
+  handleMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: any,
+  ): string {
     console.log(`Message received from client ${client.id}:`, payload);
     // You can broadcast the message to other clients or process it
     this.server.emit('message', { clientId: client.id, payload });

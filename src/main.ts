@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { DataSource } from 'typeorm';
-import { dataSourceOptions } from './config/typeorm';
+import { dataSourceOptions } from './config/typeorm.config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -16,7 +16,11 @@ async function bootstrap() {
   app.use(compression());
   app.use(helmet());
   app.enableCors();
-  app.useGlobalPipes(new ValidationPipe());
+  app.use((req, res, next) => {
+    console.log('Incoming request:', req.method, req.url);
+    next();
+  });
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableVersioning({
     type: VersioningType.URI,
   });

@@ -19,11 +19,11 @@ export class BookingController {
   constructor(
     @Inject(BookingService)
     private readonly bookingService: BookingService,
-  ) { }
+  ) {}
 
   // Create a new booking
   @HttpCode(201)
-  @Post("createBooking")
+  @Post('createBooking')
   async createBooking(@Body() request: CreateBookingDTO) {
     const booking = await this.bookingService.createBooking(request);
     return { message: 'Booking created successfully', booking };
@@ -39,7 +39,8 @@ export class BookingController {
   @HttpCode(200)
   @Get('Retrieve-specific/:identifier')
   async findOneBooking(@Param('identifier') identifier: string) {
-    const booking = await this.bookingService.findBookingByIdentifier(identifier);
+    const booking =
+      await this.bookingService.findBookingByIdentifier(identifier);
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
@@ -52,7 +53,10 @@ export class BookingController {
     @Param('identifier') identifier: string,
     @Body() request: UpdateBookingDTO,
   ) {
-    const updatedBooking = await this.bookingService.updateBooking(identifier, request);
+    const updatedBooking = await this.bookingService.updateBooking(
+      identifier,
+      request,
+    );
     return { message: 'Booking updated successfully', updatedBooking };
   }
 

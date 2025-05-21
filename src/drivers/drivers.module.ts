@@ -21,7 +21,7 @@ import { DriverAvailabilityController } from './controllers/drivers.availability
     DriversController,
     DriverAuthController,
     DriverProfileController,
-    DriverAvailabilityController
+    DriverAvailabilityController,
   ],
   exports: [DriverService],
 })
