@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Booking from '../../entities/booking.entity';
 import { Repository } from 'typeorm';
@@ -6,7 +11,7 @@ import { CreateBookingDTO } from '../dto/createBooking';
 import { PaymentService } from '../../payment/payment.service';
 import { CreatePaymentDTO } from '../../payment/dto/createPayment';
 import { DriverService } from '../../drivers/services/drivers.service';
-import { UserService } from '../../users/services/users.service'
+import { UserService } from '../../users/services/users.service';
 
 @Injectable()
 export class BookingService {
@@ -17,7 +22,7 @@ export class BookingService {
     private readonly paymentService: PaymentService,
     private readonly driverService: DriverService,
     private readonly userService: UserService, // Inject UserService
-  ) { }
+  ) {}
 
   async createBooking(request: CreateBookingDTO) {
     const {
@@ -37,7 +42,8 @@ export class BookingService {
     }
 
     // Check if the driver exists
-    const driver = await this.driverService.findOneByIdentifier(driverIdentifier);
+    const driver =
+      await this.driverService.findOneByIdentifier(driverIdentifier);
     if (!driver) {
       throw new NotFoundException('Driver not found');
     }
@@ -45,12 +51,17 @@ export class BookingService {
     // Find an available driver
     const availableDriver = await this.driverService.findAvailableDriver();
     if (!availableDriver) {
-      throw new UnprocessableEntityException('No available drivers at the moment.');
+      throw new UnprocessableEntityException(
+        'No available drivers at the moment.',
+      );
     }
 
     try {
       // Update driver availability
-      await this.driverService.updateDriverAvailability(availableDriver.identifier, false);
+      await this.driverService.updateDriverAvailability(
+        availableDriver.identifier,
+        false,
+      );
 
       // Create payment
       const paymentDto: CreatePaymentDTO = {
@@ -60,7 +71,8 @@ export class BookingService {
         paymentMethod,
       };
 
-      const { identifier: paymentIdentifier } = await this.paymentService.createPayment(paymentDto);
+      const { identifier: paymentIdentifier } =
+        await this.paymentService.createPayment(paymentDto);
 
       // Create booking
       const booking = this.bookingRepository.create({
@@ -77,7 +89,10 @@ export class BookingService {
       return savedBooking;
     } catch (error) {
       // Rollback driver availability if booking creation fails
-      await this.driverService.updateDriverAvailability(availableDriver.identifier, true);
+      await this.driverService.updateDriverAvailability(
+        availableDriver.identifier,
+        true,
+      );
       throw error;
     }
   }
@@ -88,7 +103,9 @@ export class BookingService {
     });
   }
 
-  public async findBookingByIdentifier(identifier: string): Promise<Booking | null> {
+  public async findBookingByIdentifier(
+    identifier: string,
+  ): Promise<Booking | null> {
     return await this.bookingRepository.findOne({ where: { identifier } });
   }
 
@@ -100,7 +117,10 @@ export class BookingService {
     await this.bookingRepository.remove(booking);
   }
 
-  public async updateBooking(identifier: string, request: Partial<Booking>): Promise<Booking> {
+  public async updateBooking(
+    identifier: string,
+    request: Partial<Booking>,
+  ): Promise<Booking> {
     const booking = await this.findBookingByIdentifier(identifier);
     if (!booking) {
       throw new NotFoundException('Booking not found');
@@ -110,7 +130,9 @@ export class BookingService {
   }
 
   public async endTrip(bookingIdentifier: string): Promise<Booking> {
-    const booking = await this.bookingRepository.findOne({ where: { identifier: bookingIdentifier } });
+    const booking = await this.bookingRepository.findOne({
+      where: { identifier: bookingIdentifier },
+    });
 
     if (!booking) {
       throw new NotFoundException('Booking not found');

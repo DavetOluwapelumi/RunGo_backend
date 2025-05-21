@@ -32,7 +32,7 @@ export class UserAuthService {
     private readonly userService: UserService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   private readonly logger = new Logger(UserAuthService.name);
 
@@ -56,14 +56,20 @@ export class UserAuthService {
 
       // Additional validation for students
       if (isStudent && !matricNumber) {
-        throw new BadRequestException('Matric number is required for students.');
+        throw new BadRequestException(
+          'Matric number is required for students.',
+        );
       }
 
       // Hash the password
-      const hashedPassword = await this.commonAuthService.hashPassword(rawPassword).catch((error) => {
-        this.logger.error(`Error hashing password: ${error.message}`);
-        throw new InternalServerErrorException('The request could not be completed');
-      });
+      const hashedPassword = await this.commonAuthService
+        .hashPassword(rawPassword)
+        .catch((error) => {
+          this.logger.error(`Error hashing password: ${error.message}`);
+          throw new InternalServerErrorException(
+            'The request could not be completed',
+          );
+        });
 
       // Create the payload
       const payload: CreateUserDTO = {
@@ -79,7 +85,9 @@ export class UserAuthService {
       // Save the user
       await this.userService.create(payload).catch((error) => {
         this.logger.error(`Error creating user: ${error.message}`);
-        throw new InternalServerErrorException('The request could not be completed');
+        throw new InternalServerErrorException(
+          'The request could not be completed',
+        );
       });
 
       return new ApiResponse('User account successfully created', null);
@@ -90,7 +98,10 @@ export class UserAuthService {
           throw new ConflictException(err.message);
         }
       }
-      throw new HttpException('Request could not be completed', HttpStatus.UNPROCESSABLE_ENTITY);
+      throw new HttpException(
+        'Request could not be completed',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
   }
 
@@ -98,31 +109,31 @@ export class UserAuthService {
     const { isStudent, matricNumber, email, password } = request;
 
     try {
-
       let user: User;
 
       if (isStudent) {
         if (!matricNumber) {
-          throw new BadRequestException('Matric number is required for students.');
+          throw new BadRequestException(
+            'Matric number is required for students.',
+          );
         }
         user = await this.userService.findOneByIdentifier(matricNumber);
-
       } else {
         if (!email) {
           throw new BadRequestException('Email is required for non-students.');
         }
         user = await this.userService.findOneByEmail(email);
-
       }
 
       if (!user) {
         throw new NotFoundException('Invalid credentials.');
       }
 
-      const isCorrectPassword = await this.commonAuthService.validatePasswordHash(
-        user.password,
-        password,
-      );
+      const isCorrectPassword =
+        await this.commonAuthService.validatePasswordHash(
+          user.password,
+          password,
+        );
 
       if (!isCorrectPassword) {
         throw new UnauthorizedException('Invalid credentials.');
@@ -140,7 +151,7 @@ export class UserAuthService {
       return new ApiResponse('Login successful', { jwtToken });
     } catch (error) {
       throw new HttpException(
-        (error instanceof Error ? error.message : 'An unexpected error occurred'),
+        error instanceof Error ? error.message : 'An unexpected error occurred',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }

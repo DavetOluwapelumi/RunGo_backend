@@ -31,17 +31,27 @@ export class DriverService {
     return await this.driverRepository.save(newDriver);
   }
 
-  public async updateDriverAvailability(identifier: string, isAvailable: boolean): Promise<void> {
+  public async updateDriverAvailability(
+    identifier: string,
+    isAvailable: boolean,
+  ): Promise<void> {
     await this.driverRepository.update({ identifier }, { isAvailable });
   }
 
   // New method to find an available driver
   public async findAvailableDriver(): Promise<Driver | null> {
-    return await this.driverRepository.findOne({ where: { isAvailable: true } });
+    return await this.driverRepository.findOne({
+      where: { isAvailable: true },
+    });
   }
   // Return all available drivers
   async findAllAvailableDrivers() {
-    const availableDrivers = await this.driverRepository.findBy({ isAvailable: true });
-    return new ApiResponse('Available drivers retrieved successfully', availableDrivers);
+    const availableDrivers = await this.driverRepository.findBy({
+      isAvailable: true,
+    });
+    return new ApiResponse(
+      'Available drivers retrieved successfully',
+      availableDrivers,
+    );
   }
 }

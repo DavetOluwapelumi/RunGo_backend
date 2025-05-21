@@ -31,7 +31,7 @@ export class AdminAuthService {
     private readonly adminService: AdminService,
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
-  ) { }
+  ) {}
 
   private readonly logger = new Logger(AdminAuthService.name);
 
