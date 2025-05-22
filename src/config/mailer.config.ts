@@ -6,11 +6,11 @@ export const mailerConfig: MailerOptions = {
   transport: "smtp://'':''@mailtutan",
   defaults: {
     from: '"Run.go" <admin@run.go>',
-    host: 'http://smtp.gmail.com',
+    host: process.env.SMTP_HOST,
     port: 465,
     auth: {
-      user: '',
-      pass: '',
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
     },
   },
   template: {
