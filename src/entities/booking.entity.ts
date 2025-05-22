@@ -21,6 +21,9 @@ export default class Booking {
   userIdentifier: string;
 
   @Column()
+  carIdentifier: string;
+
+  @Column()
   driverIdentifier: string;
 
   @Column()
