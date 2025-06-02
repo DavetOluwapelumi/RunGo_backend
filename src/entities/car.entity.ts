@@ -57,5 +57,6 @@ export default class Car {
   async setIdentifier() {
     this.identifier = ulid();
     this.isVerified = false;
+    this.availabilityStatus = 'inactive';
   }
 }

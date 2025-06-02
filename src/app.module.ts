@@ -17,6 +17,8 @@ import { OtpModule } from './otp/otp.module';
 import { DriverGatewayGateway } from './driver_gateway/driver_gateway.gateway';
 import { DriverGatewayModule } from './driver_gateway/driver_gateway.module';
 import typeorm from './config/typeorm.config';
+import paystackConfig from './config/paystack.config';
+
 
 @Module({
   imports: [
@@ -41,7 +43,7 @@ import typeorm from './config/typeorm.config';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [typeorm],
+      load: [typeorm, paystackConfig],
     }),
     ThrottlerModule.forRoot([
       {

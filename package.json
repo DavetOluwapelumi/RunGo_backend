@@ -44,6 +44,7 @@
     "flutterwave-node-v3": "^1.1.14",
     "helmet": "^8.0.0",
     "nodemailer": "^6.10.0",
+    "paystack-sdk": "^2.5.19",
     "pg": "^8.13.3",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
