@@ -15,4 +15,7 @@ export class CreateDriverDTO {
 
   @IsStrongPassword()
   password: string;
+
+  @IsNotEmpty()
+  carIdentifier: string;
 }

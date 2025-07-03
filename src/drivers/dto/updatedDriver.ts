@@ -17,4 +17,10 @@ export class UpdateDriverDTO extends PartialType(CreateDriverDTO) {
 
   @IsOptional()
   password?: string;
+
+  @IsOptional()
+  currentLatitude?: number;
+
+  @IsOptional()
+  currentLongitude?: number;
 }

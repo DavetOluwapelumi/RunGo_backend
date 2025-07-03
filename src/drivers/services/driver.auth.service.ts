@@ -32,7 +32,7 @@ export class DriverAuthService {
     private readonly driverService: DriverService,
     @InjectRepository(Driver)
     private readonly driverRepository: Repository<Driver>,
-  ) {}
+  ) { }
 
   private readonly logger = new Logger(DriverAuthService.name);
 
@@ -46,6 +46,7 @@ export class DriverAuthService {
       firstName,
       lastName,
       password: rawPassword,
+      carIdentifier,
     } = request;
     try {
       const existingDriver = await this.driverService.findOneByEmail(email);
@@ -81,16 +82,31 @@ export class DriverAuthService {
       email,
       phoneNumber,
       password: hashedPassword,
+      carIdentifier,
     };
-
-    await this.driverService.create(payload).catch((error) => {
+    console.log(payload);
+    const createdDriver = await this.driverService.create(payload).catch((error) => {
       this.logger.error(`Error creating driver: ${error.message}`);
       throw new InternalServerErrorException(
         'The request could not be completed',
       );
     });
 
-    return new ApiResponse('Driver account successfully created', null);
+    return new ApiResponse('Driver account successfully created', {
+      email: createdDriver.email,
+      password: createdDriver.password,
+      firstName: createdDriver.firstName,
+      lastName: createdDriver.lastName,
+      phoneNumber: createdDriver.phoneNumber,
+      identifier: createdDriver.identifier,
+      dateAdded: createdDriver.dateAdded,
+      lastUpdatedAt: createdDriver.lastUpdatedAt,
+      isVerified: createdDriver.isVerified,
+      isAvailable: createdDriver.isAvailable,
+      completedRides: createdDriver.completedRides,
+      averageRating: createdDriver.averageRating,
+      carIdentifier: createdDriver.carIdentifier,
+    });
   }
 
   public async login(request: LoginDriverDTO) {

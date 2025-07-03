@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+/*import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import * as Paystack from 'paystack-sdk';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -63,6 +63,45 @@ export class PaymentService {
         'error creating payment',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    }
+  }
+}*/
+
+import axios from 'axios';
+import { Injectable, Inject } from '@nestjs/common';
+import { CreatePaymentDTO } from './dto/createPayment';
+
+@Injectable()
+export class PaymentService {
+  private readonly paystackSecretKey: string;
+
+  constructor(
+    @Inject('paystack') private readonly paystackConfig: Record<string, any>,
+  ) {
+    this.paystackSecretKey = this.paystackConfig.paystackSecret;
+  }
+
+  async initializePayment(paymentDTO: CreatePaymentDTO) {
+    try {
+      const response = await axios.post(
+        'https://api.paystack.co/transaction/initialize',
+        {
+          email: paymentDTO.email,
+          amount: paymentDTO.amount, // in kobo
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.paystackSecretKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // This gives you the payment URL
+      return response.data;
+    } catch (error) {
+      // console.error('Paystack error:', error.response?.data || error.message);
+      throw new Error('Payment initialization failed');
     }
   }
 }

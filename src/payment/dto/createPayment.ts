@@ -1,21 +1,30 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString, IsEmail } from 'class-validator';
-import { PaymentMethod } from '../../enums/paymentMethod';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, IsEmail, isEmail } from 'class-validator';
+
 
 export class CreatePaymentDTO {
-  @IsNumber()
-  amount: number;
+  // @IsNumber()
+  // amount: number;
 
-  @IsNotEmpty()
-  referenceNumber: string;
+  // @IsNotEmpty()
+  // referenceNumber: string;
+
+  // @IsEmail()
+  // email: string;
+
+  // @IsString()
+  // @IsNotEmpty()
+  // userIdentifier: string;
+
+  // @IsNotEmpty()
+  // @IsEnum(PaymentMethod)
+  // paymentMethod: string;
 
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @IsString()
   @IsNotEmpty()
-  userIdentifier: string;
+  amount: string;
 
-  @IsNotEmpty()
-  @IsEnum(PaymentMethod)
-  paymentMethod: string;
 }

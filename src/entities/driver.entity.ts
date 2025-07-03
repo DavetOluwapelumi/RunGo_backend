@@ -2,13 +2,14 @@ import { DRIVERS_INFORMATION } from 'src/constants/tableNames';
 import { BeforeInsert, Column, Entity, PrimaryColumn, OneToOne } from 'typeorm';
 import { ulid } from 'ulid';
 import Car from './car.entity';
+import { IsNotEmpty } from 'class-validator';
 
 @Entity(DRIVERS_INFORMATION)
 export default class Driver {
   @PrimaryColumn()
   identifier: string;
 
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ name: 'carIdentifier', nullable: false })
   carIdentifier: string;
 
   @Column()
@@ -50,8 +51,15 @@ export default class Driver {
   @Column({ type: 'float', default: 0 }) // New column to track average rating
   averageRating: number;
 
+  @Column({ type: 'float', nullable: true })
+  currentLatitude: number | null;
+
+  @Column({ type: 'float', nullable: true })
+  currentLongitude: number | null;
+
   @OneToOne(() => Car, (car) => car.driver) // One-to-One relationship
   car: Car;
+
 
   @BeforeInsert()
   async setDefaults() {
@@ -59,6 +67,7 @@ export default class Driver {
     this.dateAdded = new Date();
     this.lastUpdatedAt = new Date();
     this.isVerified = false;
-    this.isAvailable = false; // Default to available when a driver is created
+    this.isAvailable = true; // Default to available when a driver is created
+    this.carIdentifier = "UNKNOWN"
   }
 }

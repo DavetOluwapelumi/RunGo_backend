@@ -49,9 +49,37 @@ export class DriverService {
     const availableDrivers = await this.driverRepository.findBy({
       isAvailable: true,
     });
+
+    // Add more details for frontend
+    const driversWithDetails = availableDrivers.map(driver => ({
+      identifier: driver.identifier,
+      firstName: driver.firstName,
+      lastName: driver.lastName,
+      phoneNumber: driver.phoneNumber,
+      averageRating: driver.averageRating,
+      completedRides: driver.completedRides,
+      carIdentifier: driver.carIdentifier,
+      isAvailable: driver.isAvailable
+    }));
+
     return new ApiResponse(
       'Available drivers retrieved successfully',
-      availableDrivers,
+      driversWithDetails,
     );
+  }
+
+  // Update driver's current location
+  public async updateDriverLocation(identifier: string, latitude: number, longitude: number): Promise<void> {
+    await this.driverRepository.update({ identifier }, { currentLatitude: latitude, currentLongitude: longitude });
+  }
+
+  // Get driver's current location
+  public async getDriverLocation(identifier: string): Promise<{ currentLatitude: number | null, currentLongitude: number | null } | null> {
+    const driver = await this.driverRepository.findOneBy({ identifier });
+    if (!driver) return null;
+    return {
+      currentLatitude: driver.currentLatitude,
+      currentLongitude: driver.currentLongitude
+    };
   }
 }

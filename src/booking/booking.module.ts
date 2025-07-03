@@ -11,16 +11,19 @@ import { PaymentService } from '../payment/payment.service';
 import { DriversModule } from '../drivers/drivers.module';
 import { UsersModule } from '../users/users.module';
 import { AdminModule } from '../admin/admin.module';
+import { RideRequestService } from './service/rideRequest.service';
+import { RideRequest } from '../entities/rideRequest.entity';
 
 @Module({
-  providers: [BookingService, PaymentService],
+  providers: [BookingService, RideRequestService],
   controllers: [BookingController],
   imports: [
     forwardRef(() => AdminModule),
-    TypeOrmModule.forFeature([Booking, Payment, User, Car]),
+    TypeOrmModule.forFeature([Booking, Payment, User, Car, RideRequest]),
     PaymentModule,
     DriversModule,
     UsersModule,
   ],
+  exports: [BookingService, RideRequestService],
 })
-export class BookingModule {}
+export class BookingModule { }
