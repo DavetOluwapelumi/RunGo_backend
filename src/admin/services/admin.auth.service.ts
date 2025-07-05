@@ -106,6 +106,7 @@ export class AdminAuthService {
         userEmail: admin.email,
         userId: admin.identifier,
         accountType: 'admin',
+        isStudent: false,
       };
       const jwtToken = await this.commonAuthService
         .generateJwt(jwtPayload)

@@ -35,5 +35,9 @@ logs:
 migrate name:
     npm run typeorm migration:create "src/migrations/{{name}}"
 
+
+generate-migrations name:
+    npm run build && npx typeorm migration:generate -d ./dist/config/typeorm.config.js ./src/migrations/{{name}}
+
 run-migrations:
-    npm run typeorm migration:run -d src/datasource.ts
+   npm run build && npx typeorm migration:run -d ./dist/config/typeorm.config.js

@@ -20,38 +20,43 @@ export class BookingController {
     @Inject(BookingService)
     private readonly bookingService: BookingService,
   ) {}
-// Create a new booking
+
+  // Create a new booking
   @HttpCode(201)
-  @Post("Create-booking")
+  @Post('createBooking')
   async createBooking(@Body() request: CreateBookingDTO) {
     const booking = await this.bookingService.createBooking(request);
     return { message: 'Booking created successfully', booking };
   }
-// Retrieve all bookings
+  // Retrieve all bookings
   @HttpCode(200)
   @Get('Retrieve-booking')
   async findAllBooking(@Param('userId') userId: string) {
     return await this.bookingService.findAllBookings(userId);
   }
 
-// Retrieve a specific booking by identifier
+  // Retrieve a specific booking by identifier
   @HttpCode(200)
   @Get('Retrieve-specific/:identifier')
   async findOneBooking(@Param('identifier') identifier: string) {
-    const booking = await this.bookingService.findBookingByIdentifier(identifier);
+    const booking =
+      await this.bookingService.findBookingByIdentifier(identifier);
     if (!booking) {
       throw new NotFoundException('Booking not found');
     }
     return booking;
   }
-// Update a specific booking by identifier
+  // Update a specific booking by identifier
   @HttpCode(200)
   @Patch('Update-specific/:identifier')
   async updateOneBooking(
     @Param('identifier') identifier: string,
     @Body() request: UpdateBookingDTO,
   ) {
-    const updatedBooking = await this.bookingService.updateBooking(identifier, request);
+    const updatedBooking = await this.bookingService.updateBooking(
+      identifier,
+      request,
+    );
     return { message: 'Booking updated successfully', updatedBooking };
   }
 
@@ -60,5 +65,12 @@ export class BookingController {
   async deleteOneBooking(@Param('identifier') identifier: string) {
     await this.bookingService.deleteBooking(identifier);
     return { message: 'Booking deleted successfully' };
+  }
+
+  @HttpCode(200)
+  @Patch('endTrip/:identifier')
+  async endTrip(@Param('identifier') identifier: string) {
+    const booking = await this.bookingService.endTrip(identifier);
+    return { message: 'Trip ended successfully', booking };
   }
 }

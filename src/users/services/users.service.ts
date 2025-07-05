@@ -13,8 +13,8 @@ export class UserService {
     return await this.userRepository.findOneBy({ email });
   }
 
-  public async findOneByIdentifier(matricNumber: string): Promise<User> {
-    return await this.userRepository.findOneBy({ matricNumber });
+  public async findOneByIdentifier(identifier: string): Promise<User> {
+    return await this.userRepository.findOneBy({ identifier });
   }
 
   public async create(payload: CreateUserDTO): Promise<User> {
