@@ -1,7 +1,14 @@
 import { USER_INFORMATION } from 'src/constants/tableNames';
-import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  PrimaryColumn,
+  OneToMany,
+} from 'typeorm';
 import { ulid } from 'ulid';
 import { OtpEntity } from './otp.entity';
+import Booking from './booking.entity';
 
 @Entity(USER_INFORMATION)
 export default class User {
@@ -26,6 +33,9 @@ export default class User {
   @Column({ unique: true })
   matricNumber: string;
 
+  @Column({ type: 'boolean', default: false })
+  isStudent: boolean;
+
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
@@ -42,8 +52,14 @@ export default class User {
   isVerified: boolean;
   id: string;
 
-  @Column({ nullable: true })
-  otpIdentifier: string;
+  @Column({ type: 'boolean', default: true }) // Add isActive property
+  isActive: boolean;
+
+  // @Column({ nullable: true })
+  // otpIdentifier: string;
+
+  @OneToMany(() => Booking, (booking) => booking.identifier)
+  bookings: Booking[];
 
   @BeforeInsert()
   async setDefaults() {

@@ -16,7 +16,7 @@ import { StatsModule } from './stats/stats.module';
 import { OtpModule } from './otp/otp.module';
 import { DriverGatewayGateway } from './driver_gateway/driver_gateway.gateway';
 import { DriverGatewayModule } from './driver_gateway/driver_gateway.module';
-import typeorm from './config/typeorm';
+import typeorm from './config/typeorm.config';
 
 @Module({
   imports: [
@@ -63,4 +63,4 @@ import typeorm from './config/typeorm';
   controllers: [AppController],
   providers: [AppService, DriverGatewayGateway],
 })
-export class AppModule {}
+export class AppModule { }

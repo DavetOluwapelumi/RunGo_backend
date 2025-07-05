@@ -21,6 +21,9 @@ export default class Payment {
   amount: number;
 
   @Column()
+  driverIdentifier: string;
+
+  @Column()
   referenceNumber: string;
 
   @Column({
