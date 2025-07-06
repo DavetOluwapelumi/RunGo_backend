@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonAuthService } from 'src/auth/auth.service.common';
 import { Admin } from '../entities/admin.entity';
@@ -23,6 +23,7 @@ import { CarModule } from 'src/car/car.module';
 import { AdminCarService } from './services/adminCar.service';
 import Car from 'src/entities/car.entity';
 import { AdminCarController } from './controllers/adminCar.controller';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   providers: [
@@ -41,6 +42,11 @@ import { AdminCarController } from './controllers/adminCar.controller';
     BookingModule,
     DriversModule,
     CarModule,
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SIGNING_KEY,
+      signOptions: { expiresIn: 15 * 60 * 60 * 1000 /*15 minutes*/ },
+    }),
   ],
   controllers: [
     AdminController,
@@ -52,4 +58,4 @@ import { AdminCarController } from './controllers/adminCar.controller';
   ],
   exports: [AdminUserService, UserService],
 })
-export class AdminModule { }
+export class AdminModule {}

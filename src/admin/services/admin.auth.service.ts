@@ -17,11 +17,14 @@ import { AdminService } from './admin.service';
 import { ApiResponse } from 'src/adapters/apiResponse';
 import { LoginAdminDTO } from '../dto/loginAdmin';
 import { JwtPayload } from 'src/interfaces/jwt';
-import { RequestPasswordResetDTO } from '../dto/requestPasswordReset';
+import { ForgottenPasswordDTO } from '../dto/requestPasswordReset';
 import { SetNewPasswordDTO } from '../dto/setNewPassword';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admin } from '../../entities/admin.entity';
+import { JwtService } from '@nestjs/jwt';
+import { RandomNumbers } from 'src/helpers/random';
+import { EmailDispatch } from 'src/helpers/mailer';
 @Injectable()
 export class AdminAuthService {
   constructor(
@@ -31,6 +34,7 @@ export class AdminAuthService {
     private readonly adminService: AdminService,
     @InjectRepository(Admin)
     private readonly adminRepository: Repository<Admin>,
+    private jwtService: JwtService,
   ) {}
 
   private readonly logger = new Logger(AdminAuthService.name);
@@ -136,12 +140,31 @@ export class AdminAuthService {
     }
   }
 
-  public async requestPasswordReset(request: RequestPasswordResetDTO) {
+  public async forgottenPassword(request: ForgottenPasswordDTO) {
     try {
       const admin = await this.adminService.findOneByEmail(request.email);
       if (!admin) {
         throw new NotFoundException('Invalid email');
       }
+
+      const payload: JwtPayload = {
+        userId: admin.identifier,
+        userEmail: admin.email,
+        accountType: 'admin',
+        isStudent: false,
+      };
+
+      //todo: save the otp
+
+      const data: Record<string, any> = {
+        name: admin.firstName,
+        otp: new RandomNumbers(6),
+      };
+
+      await new EmailDispatch('Account reset', admin.email, data).send();
+      return {
+        accessToken: await this.jwtService.signAsync(payload),
+      };
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'status' in error) {
         const err = error as { status: number; message?: string };
@@ -166,7 +189,7 @@ export class AdminAuthService {
         authorizedUser.userEmail,
       );
       if (!admin) {
-        throw new NotFoundException('Invalid email');
+        throw new NotFoundException('Invalid authorization header');
       }
 
       if (!Object.is(request.newPassword, request.confirmPassword)) {
@@ -182,6 +205,7 @@ export class AdminAuthService {
       await this.adminRepository.save(admin).catch((error) => {
         throw error;
       });
+      return { message: 'password updated successfully' };
     } catch (error) {
       if (typeof error === 'object' && error !== null && 'status' in error) {
         const err = error as { status: number; message?: string };
