@@ -17,8 +17,12 @@ export class UserService {
     return await this.userRepository.findOneBy({ identifier });
   }
 
+  public async findOneByMatricNumber(matricNumber: string): Promise<User> {
+    return await this.userRepository.findOneBy({ matricNumber });
+  }
+
   public async create(payload: CreateUserDTO): Promise<User> {
-    const { email, password, firstName, lastName, phoneNumber, matricNumber } =
+    const { email, password, firstName, lastName, phoneNumber, matricNumber, isStudent } =
       payload;
     const newUser = this.userRepository.create();
 
@@ -27,7 +31,13 @@ export class UserService {
     newUser.firstName = firstName;
     newUser.lastName = lastName;
     newUser.phoneNumber = phoneNumber;
-    newUser.matricNumber = matricNumber;
+    newUser.isStudent = isStudent;
+
+    // Only set matricNumber if it's provided and user is a student
+    if (isStudent && matricNumber) {
+      newUser.matricNumber = matricNumber;
+    }
+    // For non-students, matricNumber will remain null/undefined
 
     return await this.userRepository.save(newUser);
   }

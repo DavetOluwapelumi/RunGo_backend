@@ -11,11 +11,11 @@ export class CreateUserDTO {
   isStudent: boolean;
 
   @ValidateIf((o) => o.isStudent)
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'matricNumber should not be empty' })
   @Matches(/^RUN\/[A-Z]{3}\/\d{2}\/\d{5}$/, {
     message: 'Matric number must follow the format RUN/XXX/YY/XXXXX',
   })
-  matricNumber: string;
+  matricNumber?: string;
 
   @ValidateIf((o) => o.isStudent) // Validate only if the user is a student
   @Matches(/^[a-zA-Z]+[0-9]{5}@run\.edu\.ng$/, {
@@ -23,6 +23,7 @@ export class CreateUserDTO {
   })
   @ValidateIf((o) => !o.isStudent) // Validate only if the user is NOT a student
   @IsEmail({}, { message: 'Email must be a valid email address' })
+  @IsNotEmpty({ message: 'Email should not be empty' })
   email: string;
 
   @IsNotEmpty()

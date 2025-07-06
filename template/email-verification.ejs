@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email Address</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .otp-container {
+            background-color: #f8f9fa;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .otp-code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+            letter-spacing: 5px;
+            margin: 10px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Rungo</div>
+            <h1>Verify Your Email Address</h1>
+        </div>
+
+        <p>Hello <strong>
+                <%= firstName %>
+            </strong>,</p>
+
+        <p>Thank you for registering with Rungo! To complete your registration, please verify your email address by
+            entering the verification code below:</p>
+
+        <div class="otp-container">
+            <p><strong>Your Verification Code:</strong></p>
+            <div class="otp-code">
+                <%= otp %>
+            </div>
+            <p>This code will expire in <%= expiresIn %>
+            </p>
+        </div>
+
+        <p>You can also click the button below to verify your email:</p>
+
+        <div style="text-align: center;">
+            <a href="<%= verificationUrl %>" class="button">Verify Email Address</a>
+        </div>
+
+        <div class="warning">
+            <strong>Important:</strong> If you didn't create an account with Rungo, please ignore this email. This
+            verification code is only valid for <%= expiresIn %>.
+        </div>
+
+        <p>If you're having trouble with the button above, copy and paste the following URL into your web browser:</p>
+        <p style="word-break: break-all; color: #007bff;">
+            <%= verificationUrl %>
+        </p>
+
+        <div class="footer">
+            <p>This email was sent to <%= email %>. If you have any questions, please contact our support team.</p>
+            <p>&copy; 2024 Rungo. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>

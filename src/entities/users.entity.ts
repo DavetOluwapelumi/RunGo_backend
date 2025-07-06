@@ -30,7 +30,7 @@ export default class User {
   @Column()
   password: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   matricNumber: string;
 
   @Column({ type: 'boolean', default: false })
@@ -48,12 +48,25 @@ export default class User {
   })
   lastUpdatedAt: Date;
 
-  @Column()
+  @Column({ type: 'boolean', default: false })
   isVerified: boolean;
+
+  @Column({ name: 'email_verified', type: 'boolean', default: false })
+  emailVerified: boolean;
+
+  @Column({ name: 'email_verified_at', type: 'timestamp', nullable: true })
+  emailVerifiedAt: Date;
+
   id: string;
 
   @Column({ type: 'boolean', default: true }) // Add isActive property
   isActive: boolean;
+
+  @Column({ nullable: true })
+  profileImageUrl: string;
+
+  @Column({ nullable: true })
+  profileImagePath: string;
 
   // @Column({ nullable: true })
   // otpIdentifier: string;
@@ -66,9 +79,16 @@ export default class User {
     this.identifier = ulid();
     this.dateAdded = new Date();
     this.lastUpdatedAt = new Date();
-    this.isVerified = false;
-    if (!this.matricNumber) {
-      this.matricNumber = 'RUN/DEPT/DIGITS';
+    // Only set verification defaults if not already explicitly set
+    if (this.isVerified === undefined || this.isVerified === null) {
+      this.isVerified = false;
+    }
+    if (this.emailVerified === undefined || this.emailVerified === null) {
+      this.emailVerified = false;
+    }
+    // Ensure emailVerifiedAt is set if emailVerified is true
+    if (this.emailVerified === true && !this.emailVerifiedAt) {
+      this.emailVerifiedAt = new Date();
     }
   }
 }

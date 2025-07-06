@@ -2,6 +2,18 @@ import { registerAs } from '@nestjs/config';
 import { config as dotenvConfig } from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
+// Import all entities explicitly
+import User from '../entities/users.entity';
+import { TempUserRegistration } from '../entities/tempUserRegistration.entity';
+import { EmailVerification } from '../entities/emailVerification.entity';
+import { PasswordResetOtpEntity } from '../entities/passwordResetOtp.entity';
+import Driver from '../entities/driver.entity';
+import { RideRequest } from '../entities/rideRequest.entity';
+import Booking from '../entities/booking.entity';
+import Payment from '../entities/payment.entity';
+import Car from '../entities/car.entity';
+import { OtpEntity } from '../entities/otp.entity';
+import { Admin } from '../entities/admin.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -14,7 +26,19 @@ export const dataSourceOptions: DataSourceOptions = {
   password: `${process.env.DATABASE_PASSWORD}`,
   database: `${process.env.DATABASE_NAME}`,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
-  entities: ['dist/**/*.entity{.ts,.js}'],
+  entities: [
+    User,
+    TempUserRegistration,
+    EmailVerification,
+    PasswordResetOtpEntity,
+    Driver,
+    RideRequest,
+    Booking,
+    Payment,
+    Car,
+    OtpEntity,
+    Admin,
+  ],
   migrations: ['dist/migrations/*{.ts,.js}'],
   logging: true,
   synchronize: false,

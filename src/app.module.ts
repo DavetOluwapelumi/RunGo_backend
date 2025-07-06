@@ -18,7 +18,7 @@ import { DriverGatewayGateway } from './driver_gateway/driver_gateway.gateway';
 import { DriverGatewayModule } from './driver_gateway/driver_gateway.module';
 import typeorm from './config/typeorm.config';
 import paystackConfig from './config/paystack.config';
-
+import { mailerConfig } from './config/mailer.config';
 
 @Module({
   imports: [
@@ -29,18 +29,7 @@ import paystackConfig from './config/paystack.config';
         return config;
       },
     }),
-    MailerModule.forRoot({
-      transport: "smtp://'':''@mailtutan",
-      defaults: {
-        from: '"Run.go" <admin@run.go>',
-        host: 'mailtutan',
-        port: 1025,
-        auth: {
-          user: '',
-          pass: '',
-        },
-      },
-    }),
+    MailerModule.forRoot(mailerConfig),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [typeorm, paystackConfig],
