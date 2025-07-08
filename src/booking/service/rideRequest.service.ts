@@ -5,6 +5,8 @@ import { RideRequest } from '../../entities/rideRequest.entity';
 import { DriverService } from '../../drivers/services/drivers.service';
 import { UserService } from '../../users/services/users.service';
 import { ulid } from 'ulid';
+import { EmailService } from '../../services/email.service';
+import { Notification } from '../../entities/notification.entity';
 
 @Injectable()
 export class RideRequestService {
@@ -13,6 +15,9 @@ export class RideRequestService {
         private readonly rideRequestRepository: Repository<RideRequest>,
         private readonly driverService: DriverService,
         private readonly userService: UserService,
+        private readonly emailService: EmailService,
+        @InjectRepository(Notification)
+        private readonly notificationRepository: Repository<Notification>,
     ) { }
 
     async createRideRequest(requestData: any): Promise<RideRequest> {
@@ -49,6 +54,21 @@ export class RideRequestService {
         });
 
         const savedRequest = await this.rideRequestRepository.save(rideRequest);
+
+        // Send email to driver
+        await this.emailService.sendRideRequestNotification(
+            driver.email,
+            driver.firstName,
+            '/driver-dashboard/rides'
+        );
+
+        // Save in-app notification for the driver
+        await this.notificationRepository.save({
+            userIdentifier: driver.identifier,
+            type: 'ride-request',
+            message: `You have a new ride request from ${user.firstName} ${user.lastName}.`,
+            link: '/driver-dashboard/rides',
+        });
 
         // Handle case where save returns an array
         if (Array.isArray(savedRequest)) {
@@ -90,6 +110,24 @@ export class RideRequestService {
         if (status === 'accepted') {
             console.log(`🔍 Updating driver availability to false for driver: ${rideRequest.driverIdentifier}`);
             await this.driverService.updateDriverAvailability(rideRequest.driverIdentifier, false);
+
+            // Notify user (in-app notification)
+            await this.notificationRepository.save({
+                userIdentifier: rideRequest.userIdentifier,
+                type: 'ride-accepted',
+                message: `Your ride request has been accepted by the driver.`,
+                link: '/user-dashboard/rides',
+            });
+
+            // Notify user (email)
+            const user = await this.userService.findOneByIdentifier(rideRequest.userIdentifier);
+            if (user) {
+                await this.emailService.sendRideRequestNotification(
+                    user.email,
+                    user.firstName,
+                    '/user-dashboard/rides'
+                );
+            }
         }
 
         const updatedRideRequest = await this.findByIdentifier(identifier);

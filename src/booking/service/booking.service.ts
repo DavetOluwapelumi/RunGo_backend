@@ -205,4 +205,21 @@ export class BookingService {
     // Create booking from accepted ride request
     return await this.createBookingFromRideRequest(requestId, paymentDetails);
   }
+
+  async debitWallet(userIdentifier: string, amount: number, reference: string, description: string) {
+    const wallet = await this.walletRepository.findOne({ where: { userIdentifier } });
+    if (!wallet) throw new NotFoundException('Wallet not found');
+    if (wallet.balance < amount) throw new Error('Insufficient wallet balance');
+    wallet.balance -= amount;
+    await this.walletRepository.save(wallet);
+    const transaction = this.walletTransactionRepository.create({
+      wallet,
+      amount,
+      type: 'debit',
+      reference,
+      description,
+    });
+    await this.walletTransactionRepository.save(transaction);
+    return wallet;
+  }
 }

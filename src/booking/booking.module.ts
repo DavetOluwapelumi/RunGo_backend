@@ -13,6 +13,7 @@ import { UsersModule } from '../users/users.module';
 import { AdminModule } from '../admin/admin.module';
 import { RideRequestService } from './service/rideRequest.service';
 import { RideRequest } from '../entities/rideRequest.entity';
+import { ServicesModule } from '../services/services.module';
 
 @Module({
   providers: [BookingService, RideRequestService],
@@ -23,6 +24,7 @@ import { RideRequest } from '../entities/rideRequest.entity';
     PaymentModule,
     DriversModule,
     UsersModule,
+    ServicesModule,
   ],
   exports: [BookingService, RideRequestService],
 })

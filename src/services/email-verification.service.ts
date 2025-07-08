@@ -194,12 +194,24 @@ export class EmailVerificationService {
                 this.logger.error(`Error details: ${error.stack}`);
             }
 
+            // Fallback: Log the intended email to the console
+            const verificationUrl = `${this.configService.get('FRONTEND_URL')}/verify-email?email=${email}&otp=${otp}`;
+            console.log('[EMAIL FALLBACK]', {
+                to: email,
+                subject: 'Verify Your Email Address',
+                template: 'email-verification',
+                context: {
+                    firstName,
+                    otp,
+                    email,
+                    verificationUrl,
+                    expiresIn: '15 minutes',
+                },
+            });
+
             // For now, we'll still allow the verification to proceed
             // In production, you might want to throw an error here
             this.logger.warn(`Email verification proceeding without email sending for ${email}. OTP: ${otp}`);
-
-            // You can uncomment the line below to make email sending required
-            // throw new Error(`Failed to send verification email: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 } 

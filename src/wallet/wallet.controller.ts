@@ -23,6 +23,12 @@ export class WalletController {
         return this.walletService.getWalletByEmail(email);
     }
 
+    @Post('debit')
+    async debitWallet(@Body() body: { userIdentifier: string; amount: number; reference: string; description: string }) {
+        const { userIdentifier, amount, reference, description } = body;
+        return this.walletService.debitWallet(userIdentifier, amount, reference, description);
+    }
+
     @Get('payment/callback')
     @Redirect()
     async paymentCallback(@Query('reference') reference: string, @Query('trxref') trxref: string) {
