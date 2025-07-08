@@ -12,6 +12,7 @@ import { PreVerificationRegistrationService } from '../services/pre-verification
 import { MulterModule } from '@nestjs/platform-express';
 import { UserProfileService } from './services/user.profile.service';
 import { UserProfileController } from './controllers/user.profile.controller';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
   providers: [UserService, UserAuthService, PreVerificationRegistrationService, UserProfileService],
@@ -19,6 +20,7 @@ import { UserProfileController } from './controllers/user.profile.controller';
     TypeOrmModule.forFeature([User, EmailVerification, TempUserRegistration]),
     AuthModule,
     ServicesModule,
+    WalletModule,
     MulterModule.register({
       dest: './uploads/profile-images',
       limits: { fileSize: 5 * 1024 * 1024 },

@@ -18,6 +18,41 @@ export class WalletService {
         private readonly usersService: UserService,
     ) { }
 
+    async fundWalletByEmail(email: string, amount: number) {
+        const user = await this.usersService.findOneByEmail(email);
+        if (!user) throw new NotFoundException('User not found');
+        // Call payment service to initialize Paystack payment
+        return this.paymentService.initializePayment({
+            email,
+            amount: (amount * 100).toString(), // Convert to kobo for Paystack
+        });
+    }
+
+    async getWalletByEmail(email: string) {
+        const user = await this.usersService.findOneByEmail(email);
+        if (!user) throw new NotFoundException('User not found');
+
+        let wallet = await this.walletRepository.findOne({ where: { userIdentifier: user.identifier } });
+
+        // If wallet doesn't exist, create one with 0 balance
+        if (!wallet) {
+            wallet = this.walletRepository.create({
+                userIdentifier: user.identifier,
+                balance: 0
+            });
+            await this.walletRepository.save(wallet);
+        }
+
+        return {
+            success: true,
+            data: {
+                balance: wallet.balance,
+                userIdentifier: wallet.userIdentifier,
+                email: email
+            }
+        };
+    }
+
     async fundWallet(userIdentifier: string, dto: FundWalletDto) {
         let email = dto.email;
         if (!email) {
@@ -28,7 +63,7 @@ export class WalletService {
         // Call payment service to initialize Paystack payment
         return this.paymentService.initializePayment({
             email,
-            amount: dto.amount,
+            amount: (dto.amount * 100).toString(),
         });
     }
 

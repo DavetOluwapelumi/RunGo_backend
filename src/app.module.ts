@@ -19,6 +19,8 @@ import { DriverGatewayModule } from './driver_gateway/driver_gateway.module';
 import typeorm from './config/typeorm.config';
 import paystackConfig from './config/paystack.config';
 import { mailerConfig } from './config/mailer.config';
+import { WalletModule } from './wallet/wallet.module';
+import { LocationModule } from './location/location.module';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { mailerConfig } from './config/mailer.config';
     StatsModule,
     OtpModule,
     DriverGatewayModule,
+    WalletModule,
+    LocationModule,
   ],
   controllers: [AppController],
   providers: [AppService, DriverGatewayGateway],

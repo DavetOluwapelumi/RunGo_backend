@@ -74,11 +74,13 @@ import { CreatePaymentDTO } from './dto/createPayment';
 @Injectable()
 export class PaymentService {
   private readonly paystackSecretKey: string;
+  private readonly callbackUrl: string;
 
   constructor(
     @Inject('paystack') private readonly paystackConfig: Record<string, any>,
   ) {
     this.paystackSecretKey = this.paystackConfig.paystackSecret;
+    this.callbackUrl = this.paystackConfig.callbackUrl;
   }
 
   async initializePayment(paymentDTO: CreatePaymentDTO) {
@@ -88,6 +90,7 @@ export class PaymentService {
         {
           email: paymentDTO.email,
           amount: paymentDTO.amount, // in kobo
+          callback_url: this.callbackUrl,
         },
         {
           headers: {

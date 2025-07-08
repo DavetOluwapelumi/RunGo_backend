@@ -14,8 +14,15 @@ import Payment from '../entities/payment.entity';
 import Car from '../entities/car.entity';
 import { OtpEntity } from '../entities/otp.entity';
 import { Admin } from '../entities/admin.entity';
+import { Wallet } from '../entities/wallet.entity';
+import { WalletTransaction } from '../entities/walletTransaction.entity';
+import { Location } from '../entities/location.entity';
+import { LocationPricing } from '../entities/locationPricing.entity';
 
 dotenvConfig({ path: '.env' });
+
+// Debug: Log the BACKEND_URL to see if it's being read correctly
+console.log('DEBUG - BACKEND_URL from env:', process.env.BACKEND_URL);
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
@@ -38,6 +45,10 @@ export const dataSourceOptions: DataSourceOptions = {
     Car,
     OtpEntity,
     Admin,
+    Wallet,
+    WalletTransaction,
+    Location,
+    LocationPricing,
   ],
   migrations: ['dist/migrations/*{.ts,.js}'],
   logging: true,
