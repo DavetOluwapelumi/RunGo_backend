@@ -5,6 +5,7 @@ import Car from '../entities/car.entity';
 import Booking from '../entities/booking.entity';
 import Driver from 'src/entities/driver.entity';
 import { CreateCarDto } from './dto/registerCar';
+import { CarType } from '../enums/carType.enum';
 
 @Injectable()
 export class CarService {
@@ -23,8 +24,26 @@ export class CarService {
             throw new NotFoundException('Driver not found');
         }
 
+        // Check if driver already has a car
+        const existingCar = await this.carRepository.findOneBy({ driverIdentifier: driverId });
+        if (existingCar) {
+            throw new BadRequestException('Driver already has a registered car. Please update the existing car or contact support.');
+        }
+
         const car = this.carRepository.create({ ...data, driver });
-        return await this.carRepository.save(car);
+        const savedCar = await this.carRepository.save(car);
+        // Log all car details and the driver who owns the car
+        console.log('Car registered:', {
+            car: savedCar,
+            driver: {
+                identifier: driver.identifier,
+                firstName: driver.firstName,
+                lastName: driver.lastName,
+                email: driver.email,
+                phoneNumber: driver.phoneNumber
+            }
+        });
+        return savedCar;
     }
 
     // Verify a car
@@ -85,5 +104,13 @@ export class CarService {
         }
 
         return car;
+    }
+
+    // Update car type
+    public async updateCarType(identifier: string, carType: CarType): Promise<Car> {
+        const car = await this.carRepository.findOneBy({ identifier });
+        if (!car) throw new NotFoundException('Car not found');
+        car.carType = carType;
+        return await this.carRepository.save(car);
     }
 }

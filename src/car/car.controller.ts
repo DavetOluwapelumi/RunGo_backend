@@ -3,6 +3,7 @@ import { CarService } from './car.service';
 import Car from '../entities/car.entity';
 import { CreateCarDto } from './dto/registerCar';
 import { UpdateCarAvailabilityDto } from './dto/updateCarAvailability';
+import { UpdateCarTypeDto } from './dto/updateCarType.dto';
 
 @Controller({ version: '1', path: 'cars' })
 export class CarController {
@@ -50,5 +51,16 @@ export class CarController {
   @Get(':identifier/history')
   public async getCarHistory(@Param('identifier') identifier: string): Promise<Car> {
     return await this.carService.getCarHistory(identifier);
+  }
+
+  @Patch(':identifier/type')
+  public async updateCarType(
+    @Param('identifier') identifier: string,
+    @Body() body: UpdateCarTypeDto,
+  ): Promise<{ message: string; data: Car }> {
+    return {
+      message: 'Car type updated successfully',
+      data: await this.carService.updateCarType(identifier, body.carType),
+    };
   }
 }

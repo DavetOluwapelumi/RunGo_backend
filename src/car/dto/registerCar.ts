@@ -1,5 +1,6 @@
 import { IsString, IsNotEmpty, IsNumber, IsOptional, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
+import { CarType } from '../../enums/carType.enum';
 
 export class CreateCarDto {
     @IsString()
@@ -27,8 +28,8 @@ export class CreateCarDto {
 
     @IsString()
     @IsNotEmpty()
-    @IsIn(['bus', 'car', 'tricycle'])
-    carType: string;
+    @IsIn(Object.values(CarType))
+    carType: CarType;
 
     @IsString()
     @IsIn(['active', 'inactive', 'under_maintenance'])

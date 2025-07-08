@@ -2,6 +2,7 @@ import { CAR_INFORMATION } from 'src/constants/tableNames';
 import { BeforeInsert, Column, Entity, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
 import { ulid } from 'ulid';
 import Driver from './driver.entity';
+import { CarType } from '../enums/carType.enum';
 
 @Entity(CAR_INFORMATION)
 export default class Car {
@@ -20,8 +21,8 @@ export default class Car {
   @Column()
   carColor: string;
 
-  @Column()
-  carType: string;
+  @Column({ type: 'enum', enum: CarType })
+  carType: CarType;
 
   @Column()
   carPlateNumber: string;
