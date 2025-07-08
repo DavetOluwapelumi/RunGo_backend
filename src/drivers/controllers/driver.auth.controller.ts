@@ -10,6 +10,7 @@ import {
   Request,
   NotFoundException,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { DriverAuthService } from '../services/driver.auth.service';
 import { DriverService } from '../services/drivers.service';
@@ -23,6 +24,8 @@ import { IsEmail, IsNotEmpty } from 'class-validator';
 import { DriverForgotPasswordDTO } from '../dto/forgotPassword';
 import { DriverVerifyOtpDTO } from '../dto/verifyOtp';
 import { DriverResetPasswordDTO } from '../dto/resetPassword';
+import { DriverProfileService } from '../services/driver.profile.service';
+import { AuthGuard } from '@nestjs/passport';
 
 class ResendOtpDTO {
   @IsEmail()
@@ -37,6 +40,7 @@ export class DriverAuthController {
     private readonly driverAuthService: DriverAuthService,
     @Inject(DriverService)
     private readonly driverService: DriverService,
+    private readonly driverProfileService: DriverProfileService,
   ) { }
 
   @HttpCode(201)
@@ -94,5 +98,17 @@ export class DriverAuthController {
   @Post('set-password')
   async setPassword(@Body() request: DriverResetPasswordDTO) {
     return this.driverAuthService.resetPassword(request);
+  }
+
+  @Get('profile')
+  @UseGuards(AuthGuard('jwt'))
+  async getProfile(@Request() req: any) {
+    return this.driverProfileService.getProfile(req.user);
+  }
+
+  @Put('profile')
+  @UseGuards(AuthGuard('jwt'))
+  async updateProfile(@Request() req: any, @Body() updateDto: any) {
+    return this.driverProfileService.updateProfile(req.user, updateDto);
   }
 }
