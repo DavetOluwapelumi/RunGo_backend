@@ -66,7 +66,9 @@ export default class Driver {
     this.identifier = ulid();
     this.dateAdded = new Date();
     this.lastUpdatedAt = new Date();
-    this.isVerified = false;
+    if (this.isVerified === undefined) {
+      this.isVerified = false;
+    }
     this.isAvailable = true; // Default to available when a driver is created
     this.carIdentifier = "UNKNOWN"
   }

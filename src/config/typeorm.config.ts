@@ -18,6 +18,7 @@ import { Wallet } from '../entities/wallet.entity';
 import { WalletTransaction } from '../entities/walletTransaction.entity';
 import { Location } from '../entities/location.entity';
 import { LocationPricing } from '../entities/locationPricing.entity';
+import { TempDriverRegistration } from '../entities/tempDriverRegistration.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -49,6 +50,7 @@ export const dataSourceOptions: DataSourceOptions = {
     WalletTransaction,
     Location,
     LocationPricing,
+    TempDriverRegistration,
   ],
   migrations: ['dist/migrations/*{.ts,.js}'],
   logging: true,

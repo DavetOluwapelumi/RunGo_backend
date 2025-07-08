@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Location } from '../entities/location.entity';
 import { LocationPricing } from '../entities/locationPricing.entity';
+import { CarType } from '../enums/carType.enum';
 
 @Injectable()
 export class LocationService {
@@ -132,92 +133,108 @@ export class LocationService {
 
     async seedPricing(): Promise<void> {
         const locations = await this.getAllLocations();
+        const carTypes: CarType[] = Object.values(CarType);
 
-        // Base price for all routes (you can customize this)
-        const basePrice = 500; // ₦500 base price
+        // Define regions as per user specification
+        const regions = {
+            mainSchool: [
+                "University Auditorium Region", "Manna Palace Cafeteria", "Lecture Rooms Regions", "Library Region",
+                "Container", "Tourism Village Region", "Faculty of Humanities and Social Sciences", "Health Center"
+            ],
+            healthCenter: [
+                "Prophet Moses Hall Region", "Extension Region", "Health Center"
+            ],
+            secondGate: [
+                "CCBR", "Event Center", "ACEGID (Along Engr Faculty)"
+            ],
+            staffQuarters: [
+                "Female Hostel First Gate", "Staff Quarters"
+            ],
+            engineering: [
+                "Engineering Faculty", "Engineering Hostel", "BMS", "Guest Hostel", "ACEGID (Along Engr Faculty)"
+            ],
+            numbersBukateria: [
+                "Number Bukateria", "Female Hostel First Gate"
+            ]
+        };
+
+        // Helper to get all region keys a location belongs to
+        function getRegions(location: string): string[] {
+            return Object.entries(regions)
+                .filter(([_, locs]) => locs.includes(location))
+                .map(([region]) => region);
+        }
+
+        // Helper to check if two locations are in two specific regions (in any order)
+        function isRegionPair(pickup: string, dropoff: string, regionA: string, regionB: string): boolean {
+            const pickupRegions = getRegions(pickup);
+            const dropoffRegions = getRegions(dropoff);
+            return (
+                (pickupRegions.includes(regionA) && dropoffRegions.includes(regionB)) ||
+                (pickupRegions.includes(regionB) && dropoffRegions.includes(regionA))
+            );
+        }
+
+        // Pricing rules as per user
+        function getPrice(pickup: string, dropoff: string, carType: CarType): number {
+            if (isRegionPair(pickup, dropoff, 'mainSchool', 'healthCenter')) {
+                return carType === CarType.KEKE ? 400 : 800;
+            }
+            if (isRegionPair(pickup, dropoff, 'mainSchool', 'secondGate')) {
+                return carType === CarType.KEKE ? 400 : 800;
+            }
+            if (isRegionPair(pickup, dropoff, 'engineering', 'mainSchool')) {
+                return carType === CarType.KEKE ? 600 : 1200;
+            }
+            if (isRegionPair(pickup, dropoff, 'engineering', 'numbersBukateria')) {
+                return carType === CarType.KEKE ? 450 : 1000;
+            }
+            if (isRegionPair(pickup, dropoff, 'staffQuarters', 'mainSchool')) {
+                return carType === CarType.KEKE ? 600 : 1200;
+            }
+            if (isRegionPair(pickup, dropoff, 'healthCenter', 'engineering')) {
+                return carType === CarType.KEKE ? 600 : 1200;
+            }
+            if (isRegionPair(pickup, dropoff, 'staffQuarters', 'healthCenter')) {
+                return carType === CarType.KEKE ? 400 : 1200;
+            }
+
+            // Default price if no rule matches
+            if (carType === CarType.KEKE) {
+                return 400;
+            } else {
+                return 600;
+            }
+        }
 
         for (let i = 0; i < locations.length; i++) {
             for (let j = 0; j < locations.length; j++) {
-                if (i !== j) { // Don't create pricing for same location
+                if (i !== j) {
                     const pickupLocation = locations[i];
                     const dropoffLocation = locations[j];
 
-                    // Check if pricing already exists
-                    const existingPricing = await this.locationPricingRepository.findOne({
-                        where: {
-                            pickupLocationId: pickupLocation.id,
-                            dropoffLocationId: dropoffLocation.id,
-                        }
-                    });
-
-                    if (!existingPricing) {
-                        // Calculate price based on distance (you can customize this logic)
-                        const price = this.calculatePrice(pickupLocation.location, dropoffLocation.location, basePrice);
-
-                        const pricing = this.locationPricingRepository.create({
-                            pickupLocationId: pickupLocation.id,
-                            dropoffLocationId: dropoffLocation.id,
-                            price: price,
+                    for (const carType of carTypes) {
+                        const existingPricing = await this.locationPricingRepository.findOne({
+                            where: {
+                                pickupLocationId: pickupLocation.id,
+                                dropoffLocationId: dropoffLocation.id,
+                                carType,
+                            }
                         });
-
-                        await this.locationPricingRepository.save(pricing);
+                        if (!existingPricing) {
+                            const price = getPrice(pickupLocation.location, dropoffLocation.location, carType);
+                            console.log(`Seeding: ${pickupLocation.location} -> ${dropoffLocation.location} [${carType}] = ${price}`);
+                            const pricing = this.locationPricingRepository.create({
+                                pickupLocationId: pickupLocation.id,
+                                dropoffLocationId: dropoffLocation.id,
+                                price: price,
+                                carType,
+                            });
+                            await this.locationPricingRepository.save(pricing);
+                        }
                     }
                 }
             }
         }
-    }
-
-    private calculatePrice(pickup: string, dropoff: string, basePrice: number): number {
-        // Simple pricing logic - you can make this more sophisticated
-        // For now, using base price for all routes
-        // You can add distance-based pricing, zone-based pricing, etc.
-
-        // Example: Different pricing for different zones
-        const engineeringZone = ['Engineering Faculty', 'Engineering Hostel', 'ACEGID (Along Engr Faculty)'];
-        const academicZone = ['Library Region', 'Lecture Rooms Regions', 'Faculty of Humanities and Social Sciences'];
-        const residentialZone = ['Female Hostel First Gate', 'Guest Hostel', 'Staff Quarters'];
-        const commercialZone = ['Manna Palace Cafeteria', 'Number Bukateria', 'Event Center'];
-
-        const pickupZone = this.getZone(pickup);
-        const dropoffZone = this.getZone(dropoff);
-
-        // Same zone: lower price
-        if (pickupZone === dropoffZone) {
-            return basePrice * 0.8; // 20% discount for same zone
-        }
-
-        // Adjacent zones: base price
-        if (this.areAdjacentZones(pickupZone, dropoffZone)) {
-            return basePrice;
-        }
-
-        // Far zones: higher price
-        return basePrice * 1.2; // 20% premium for far zones
-    }
-
-    private getZone(location: string): string {
-        const engineeringZone = ['Engineering Faculty', 'Engineering Hostel', 'ACEGID (Along Engr Faculty)'];
-        const academicZone = ['Library Region', 'Lecture Rooms Regions', 'Faculty of Humanities and Social Sciences'];
-        const residentialZone = ['Female Hostel First Gate', 'Guest Hostel', 'Staff Quarters'];
-        const commercialZone = ['Manna Palace Cafeteria', 'Number Bukateria', 'Event Center'];
-
-        if (engineeringZone.includes(location)) return 'engineering';
-        if (academicZone.includes(location)) return 'academic';
-        if (residentialZone.includes(location)) return 'residential';
-        if (commercialZone.includes(location)) return 'commercial';
-
-        return 'other'; // For locations not in specific zones
-    }
-
-    private areAdjacentZones(zone1: string, zone2: string): boolean {
-        // Define which zones are adjacent
-        const adjacentZones = {
-            'engineering': ['academic', 'commercial'],
-            'academic': ['engineering', 'residential'],
-            'residential': ['academic', 'commercial'],
-            'commercial': ['engineering', 'residential'],
-        };
-
-        return adjacentZones[zone1]?.includes(zone2) || adjacentZones[zone2]?.includes(zone1);
     }
 } 

@@ -18,6 +18,17 @@ import { LoginDriverDTO } from '../dto/loginDriver';
 import { RequestPasswordResetDTO } from '../dto/requestPasswordReset';
 import { SetNewPasswordDTO } from '../dto/setNewPassword';
 import { JwtPayload } from 'src/interfaces/jwt';
+import { DriverVerifyRegistrationDTO } from '../dto/verifyRegistration';
+import { IsEmail, IsNotEmpty } from 'class-validator';
+import { DriverForgotPasswordDTO } from '../dto/forgotPassword';
+import { DriverVerifyOtpDTO } from '../dto/verifyOtp';
+import { DriverResetPasswordDTO } from '../dto/resetPassword';
+
+class ResendOtpDTO {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+}
 
 @Controller({ version: '1', path: 'driver/auth' })
 export class DriverAuthController {
@@ -26,7 +37,7 @@ export class DriverAuthController {
     private readonly driverAuthService: DriverAuthService,
     @Inject(DriverService)
     private readonly driverService: DriverService,
-  ) {}
+  ) { }
 
   @HttpCode(201)
   @Post('register')
@@ -57,5 +68,31 @@ export class DriverAuthController {
     @Request() authorizedUser: JwtPayload,
   ) {
     return this.driverAuthService.setNewPassword(request, authorizedUser);
+  }
+
+  @Post('verify-registration')
+  async verifyDriverRegistration(@Body() request: DriverVerifyRegistrationDTO) {
+    console.log('Received verify-registration request:', request);
+    return this.driverAuthService.verifyOtp(request.email, request.otp);
+  }
+
+  @Post('resend-verification')
+  async resendDriverOtp(@Body() request: ResendOtpDTO) {
+    return this.driverAuthService.resendOtp(request.email);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() request: DriverForgotPasswordDTO) {
+    return this.driverAuthService.forgotPassword(request);
+  }
+
+  @Post('verify-otp')
+  async verifyOtp(@Body() request: DriverVerifyOtpDTO) {
+    return this.driverAuthService.verifyOtpForPasswordReset(request);
+  }
+
+  @Post('set-password')
+  async setPassword(@Body() request: DriverResetPasswordDTO) {
+    return this.driverAuthService.resetPassword(request);
   }
 }

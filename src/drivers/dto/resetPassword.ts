@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class DriverResetPasswordDTO {
     @IsEmail()
@@ -7,11 +7,14 @@ export class DriverResetPasswordDTO {
 
     @IsString()
     @IsNotEmpty()
-    @MinLength(8, { message: 'Password must be at least 8 characters' })
+    @Length(6, 6, { message: 'OTP must be exactly 6 characters' })
+    otp: string;
+
+    @IsString()
+    @IsNotEmpty()
     newPassword: string;
 
     @IsString()
     @IsNotEmpty()
-    @MinLength(8, { message: 'Password must be at least 8 characters' })
     confirmPassword: string;
 } 

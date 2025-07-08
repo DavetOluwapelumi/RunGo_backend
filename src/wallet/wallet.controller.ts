@@ -28,10 +28,10 @@ export class WalletController {
     async paymentCallback(@Query('reference') reference: string, @Query('trxref') trxref: string) {
         console.log('Payment callback received - Reference:', reference, 'Trxref:', trxref);
 
-        // Redirect to frontend wallet tab
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        // Redirect to frontend user dashboard
+        const frontendUrl = 'http://localhost:3000/user_dashboard/dashboard';
         return {
-            url: `${frontendUrl}/dashboard?tab=wallet&payment=success&reference=${reference}`,
+            url: `${frontendUrl}?payment=success&reference=${reference}`,
         };
     }
 
@@ -39,7 +39,7 @@ export class WalletController {
     @Post('paystack/webhook')
     async paystackWebhook(@Body() body: any) {
         console.log('Paystack webhook received:', JSON.stringify(body, null, 2));
-        // 1. Check if event is charge.success
+        // 1. Check if event is charge.successSS
         if (body.event === 'charge.success') {
             const email = body.data?.customer?.email;
             const amount = body.data?.amount ? body.data.amount / 100 : 0; // Paystack sends amount in kobo, convert to Naira

@@ -119,21 +119,17 @@ export class PreVerificationDriverRegistrationService {
                 this.logger.log(`[DEBUG] Found temp registration: ${tempRegistration ? 'Yes' : 'No'}`);
 
                 if (!tempRegistration) {
-                    this.logger.error(`[DEBUG] No temp registration found for email: ${email}, OTP: ${otp}`);
-
                     // Let's check what temp registrations exist for this email
                     const allTempRegistrations = await transactionalEntityManager.find(TempDriverRegistration, {
                         where: { email }
                     });
 
-                    this.logger.log(`[DEBUG] All temp registrations for ${email}:`, allTempRegistrations.map(tr => ({
-                        id: tr.id,
-                        otp: tr.otp,
-                        used: tr.used,
-                        expiresAt: tr.expiresAt
-                    })));
+                    if (!allTempRegistrations || allTempRegistrations.length === 0) {
+                        throw new NotFoundException('No registration found for this email. Please register first.');
+                    }
 
-                    throw new BadRequestException('Invalid OTP');
+                    // If there are temp registrations but none match the OTP
+                    throw new BadRequestException('Invalid OTP. Please check the code and try again.');
                 }
 
                 this.logger.log(`[DEBUG] Temp registration found:`, {
@@ -146,8 +142,7 @@ export class PreVerificationDriverRegistrationService {
 
                 // Check if OTP has expired
                 if (new Date() > tempRegistration.expiresAt) {
-                    this.logger.error(`[DEBUG] OTP expired. Current time: ${new Date()}, Expires at: ${tempRegistration.expiresAt}`);
-                    throw new BadRequestException('OTP has expired');
+                    throw new BadRequestException('OTP has expired. Please request a new code.');
                 }
 
                 // Mark OTP as used
