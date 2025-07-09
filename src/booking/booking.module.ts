@@ -14,13 +14,16 @@ import { AdminModule } from '../admin/admin.module';
 import { RideRequestService } from './service/rideRequest.service';
 import { RideRequest } from '../entities/rideRequest.entity';
 import { ServicesModule } from '../services/services.module';
+import { Wallet } from '../entities/wallet.entity';
+import { WalletTransaction } from '../entities/walletTransaction.entity';
+import { Notification } from '../entities/notification.entity';
 
 @Module({
   providers: [BookingService, RideRequestService],
   controllers: [BookingController],
   imports: [
     forwardRef(() => AdminModule),
-    TypeOrmModule.forFeature([Booking, Payment, User, Car, RideRequest]),
+    TypeOrmModule.forFeature([Booking, Payment, User, Car, RideRequest, Wallet, WalletTransaction, Notification]),
     PaymentModule,
     DriversModule,
     UsersModule,

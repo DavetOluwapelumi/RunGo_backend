@@ -14,13 +14,18 @@ import { DriverService } from '../../drivers/services/drivers.service';
 import { UserService } from '../../users/services/users.service';
 import { RideRequestService } from './rideRequest.service';
 import { CreateRideRequestDTO } from '../dto/createRideRequest';
-
+import { Wallet } from '../../entities/wallet.entity';
+import { WalletTransaction } from '../../entities/walletTransaction.entity';
 
 @Injectable()
 export class BookingService {
   constructor(
     @InjectRepository(Booking)
     private readonly bookingRepository: Repository<Booking>,
+    @InjectRepository(Wallet)
+    private readonly walletRepository: Repository<Wallet>,
+    @InjectRepository(WalletTransaction)
+    private readonly walletTransactionRepository: Repository<WalletTransaction>,
     @Inject(PaymentService)
     private readonly paymentService: PaymentService,
     private readonly driverService: DriverService,
@@ -60,6 +65,14 @@ export class BookingService {
       throw new UnprocessableEntityException('Selected driver is not available');
     }
 
+    // Handle wallet payment validation
+    if (paymentMethod === 'Wallet') {
+      const walletValidation = await this.validateWalletBalance(userIdentifier, amountPaid);
+      if (!walletValidation.canProceed) {
+        throw new UnprocessableEntityException(walletValidation.message);
+      }
+    }
+
     try {
       // Update selected driver availability to false (busy)
       await this.driverService.updateDriverAvailability(
@@ -67,14 +80,27 @@ export class BookingService {
         false,
       );
 
-      // Create payment
-      const paymentDto: CreatePaymentDTO = {
-        amount: amountPaid.toString(),
-        email: user.email,
-      };
+      let paymentIdentifier: string;
 
-      const paymentResponse = await this.paymentService.initializePayment(paymentDto);
-      const paymentIdentifier = paymentResponse.data.reference;
+      // Handle different payment methods
+      if (paymentMethod === 'Wallet') {
+        // For wallet payment, debit the wallet and create a transaction
+        await this.debitWallet(
+          userIdentifier,
+          amountPaid,
+          paymentReferenceNumber,
+          `Ride booking from ${pickupLocation} to ${destination}`
+        );
+        paymentIdentifier = paymentReferenceNumber; // Use the reference as payment identifier
+      } else {
+        // For cash payment, initialize external payment
+        const paymentDto: CreatePaymentDTO = {
+          amount: amountPaid.toString(),
+          email: user.email,
+        };
+        const paymentResponse = await this.paymentService.initializePayment(paymentDto);
+        paymentIdentifier = paymentResponse.data.reference;
+      }
 
       // Use the selected driver's car identifier
       const carIdentifier = selectedDriver.carIdentifier;
@@ -221,5 +247,38 @@ export class BookingService {
     });
     await this.walletTransactionRepository.save(transaction);
     return wallet;
+  }
+
+  /**
+   * Check wallet balance and validate if sufficient for ride fare
+   * This method will be called when user selects wallet payment option
+   */
+  async validateWalletBalance(userIdentifier: string, rideFare: number) {
+    const wallet = await this.walletRepository.findOne({ where: { userIdentifier } });
+
+    if (!wallet) {
+      return {
+        hasWallet: false,
+        hasSufficientFunds: false,
+        currentBalance: 0,
+        requiredAmount: rideFare,
+        message: 'Wallet not found. Please create a wallet first.',
+        canProceed: false
+      };
+    }
+
+    const hasSufficientFunds = wallet.balance >= rideFare;
+
+    return {
+      hasWallet: true,
+      hasSufficientFunds,
+      currentBalance: wallet.balance,
+      requiredAmount: rideFare,
+      shortfall: hasSufficientFunds ? 0 : rideFare - wallet.balance,
+      message: hasSufficientFunds
+        ? 'Wallet has sufficient funds for this ride.'
+        : `Insufficient wallet balance. Current balance: ${wallet.balance}, Required: ${rideFare}. Please add ${rideFare - wallet.balance} to your wallet.`,
+      canProceed: hasSufficientFunds
+    };
   }
 }

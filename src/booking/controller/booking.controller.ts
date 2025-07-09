@@ -177,4 +177,17 @@ export class BookingController {
     }
     return location;
   }
+
+  // Validate wallet balance before booking
+  @Get('validate-wallet-balance')
+  async validateWalletBalance(
+    @Query('userIdentifier') userIdentifier: string,
+    @Query('rideFare') rideFare: number
+  ) {
+    const validation = await this.bookingService.validateWalletBalance(userIdentifier, rideFare);
+    return {
+      message: validation.message,
+      ...validation
+    };
+  }
 }
