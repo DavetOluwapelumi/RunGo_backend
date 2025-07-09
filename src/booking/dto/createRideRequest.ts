@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
 
 export class CreateRideRequestDTO {
-    @IsNotEmpty()
+    @IsOptional() // Make optional since it comes from JWT
     @IsString()
-    userIdentifier: string;
+    userIdentifier?: string;
 
     @IsNotEmpty()
     @IsString()

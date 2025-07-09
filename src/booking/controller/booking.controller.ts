@@ -10,7 +10,10 @@ import {
   Query,
   HttpCode,
   NotFoundException,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { BookingService } from '../service/booking.service';
 import { CreateBookingDTO } from '../dto/createBooking';
 import { UpdateBookingDTO } from '../dto/updateBooking';
@@ -21,6 +24,7 @@ import { RespondToRideRequestDTO } from '../dto/respondToRideRequest';
 import { PaginationDTO } from '../dto/pagination.dto';
 import { DriverService } from '../../drivers/services/drivers.service';
 import { RideRequestService } from '../service/rideRequest.service';
+import { JwtPayload } from '../../interfaces/jwt';
 
 
 @Controller({ version: '1', path: 'booking' })
@@ -74,8 +78,30 @@ export class BookingController {
 
   // 1. Create ride request (no payment)
   @Post('request-ride')
-  async requestRide(@Body() request: CreateRideRequestDTO) {
-    const rideRequest = await this.bookingService.createRideRequest(request);
+  @UseGuards(AuthGuard('jwt'))
+  async requestRide(
+    @Body() request: CreateRideRequestDTO,
+    @Request() req
+  ) {
+    // Extract userIdentifier from JWT - use userId, not identifier
+    const userIdentifier = req.user.userId;
+
+    console.log(' JWT user object:', req.user);
+    console.log(' JWT userIdentifier (userId):', userIdentifier);
+    console.log('🔍 Request body:', request);
+
+    // Create the request data with userIdentifier from JWT
+    const rideRequestData = {
+      userIdentifier,
+      driverIdentifier: request.driverIdentifier,
+      pickupLocation: request.pickupLocation,
+      destination: request.destination,
+      estimatedAmount: request.estimatedAmount
+    };
+
+    console.log(' Final ride request data:', rideRequestData);
+
+    const rideRequest = await this.bookingService.createRideRequest(rideRequestData);
     return {
       message: 'Ride request sent to driver',
       rideRequest,
@@ -180,10 +206,12 @@ export class BookingController {
 
   // Validate wallet balance before booking
   @Get('validate-wallet-balance')
+  @UseGuards(AuthGuard('jwt'))
   async validateWalletBalance(
-    @Query('userIdentifier') userIdentifier: string,
-    @Query('rideFare') rideFare: number
+    @Query('rideFare') rideFare: number,
+    @Request() req
   ) {
+    const userIdentifier = req.user.userId; // Use userId, not identifier
     const validation = await this.bookingService.validateWalletBalance(userIdentifier, rideFare);
     return {
       message: validation.message,
