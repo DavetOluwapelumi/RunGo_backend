@@ -31,7 +31,6 @@ async function bootstrap() {
     transaction: 'all',
   });
 
-  //TODO: create super admin account if not exists 
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

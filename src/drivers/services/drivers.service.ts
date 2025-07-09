@@ -59,5 +59,5 @@ export class DriverService {
     return await this.driverRepository.count();
   }
 
-  private async findAll(){}
+  private async findAll() {}
 }
