@@ -6,5 +6,6 @@ import Payment from '../entities/payment.entity';
 @Module({
   providers: [PaymentService],
   imports: [TypeOrmModule.forFeature([Payment])],
+  exports: [PaymentService],
 })
 export class PaymentModule {}

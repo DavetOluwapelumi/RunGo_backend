@@ -31,4 +31,8 @@ export class UserService {
 
     return await this.userRepository.save(newUser);
   }
+
+  public async countAll() {
+    return this.userRepository.count();
+  }
 }

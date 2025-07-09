@@ -37,4 +37,8 @@ export class PaymentService {
       );
     }
   }
+
+  public async getStats() {
+    return {};
+  }
 }

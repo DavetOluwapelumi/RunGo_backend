@@ -1,26 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStatDto } from './dto/create-stat.dto';
-import { UpdateStatDto } from './dto/update-stat.dto';
+import { AdminService } from 'src/admin/services/admin.service';
+import { BookingService } from 'src/booking/service/booking.service';
+import { DriverService } from 'src/drivers/services/drivers.service';
+import { UserService } from 'src/users/services/users.service';
 
+import { PaymentService } from 'src/payment/payment.service';
+
+interface MetricsInterface {
+  transactions: object;
+  drivers: number;
+  admin: number;
+  revenue: object;
+  users: number;
+}
 @Injectable()
 export class StatsService {
-  create(createStatDto: CreateStatDto) {
-    return 'This action adds a new stat';
-  }
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly userService: UserService,
+    private readonly driverService: DriverService,
+    private readonly bookingService: BookingService,
+    private readonly paymentService: PaymentService,
+  ) {}
 
-  findAll() {
-    return `This action returns all stats`;
-  }
+  async fetchMetrics() {
+    const metrics: MetricsInterface = {
+      transactions: {},
+      drivers: 0,
+      admin: 0,
+      revenue: {},
+      users: 0,
+    };
 
-  findOne(id: number) {
-    return `This action returns a #${id} stat`;
-  }
+    metrics.admin = await this.adminService.countAll();
+    metrics.drivers = await this.driverService.countAll();
+    metrics.revenue = await this.paymentService.getStats();
+    metrics.transactions = await this.bookingService.getStats();
+    metrics.users = await this.userService.countAll();
 
-  update(id: number, updateStatDto: UpdateStatDto) {
-    return `This action updates a #${id} stat`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} stat`;
+    return metrics;
   }
 }

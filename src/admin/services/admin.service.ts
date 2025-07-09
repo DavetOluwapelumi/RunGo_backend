@@ -28,4 +28,14 @@ export class AdminService {
 
     return await this.adminRepository.save(newAdmin);
   }
+
+  public async countAll() {
+    return this.adminRepository.count();
+  }
+
+  private async findAll() {}
+
+  private async invite() {}
+
+  private async onboard() {}
 }

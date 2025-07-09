@@ -22,5 +22,6 @@ import { AdminModule } from '../admin/admin.module';
     DriversModule,
     UsersModule,
   ],
+  exports: [BookingService],
 })
 export class BookingModule {}
