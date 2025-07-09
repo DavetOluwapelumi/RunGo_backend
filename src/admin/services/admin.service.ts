@@ -32,4 +32,10 @@ export class AdminService {
   public async countAll() {
     return this.adminRepository.count();
   }
+
+  private async findAll() {}
+
+  private async invite() {}
+
+  private async onboard() {}
 }
