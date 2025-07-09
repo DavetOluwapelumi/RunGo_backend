@@ -141,4 +141,7 @@ export class BookingService {
     booking.dropoffTime = new Date(); // Set dropoffTime to the current timestamp
     return await this.bookingRepository.save(booking);
   }
+  public async getStats() {
+    return {};
+  }
 }

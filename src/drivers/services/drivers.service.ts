@@ -54,4 +54,8 @@ export class DriverService {
       availableDrivers,
     );
   }
+
+  public async countAll(): Promise<number> {
+    return await this.driverRepository.count();
+  }
 }
