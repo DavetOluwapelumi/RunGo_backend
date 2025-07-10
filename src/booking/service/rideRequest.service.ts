@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import { RideRequest } from '../../entities/rideRequest.entity';
 import { DriverService } from '../../drivers/services/drivers.service';
 import { UserService } from '../../users/services/users.service';
@@ -18,6 +19,7 @@ export class RideRequestService {
         private readonly emailService: EmailService,
         @InjectRepository(Notification)
         private readonly notificationRepository: Repository<Notification>,
+        private readonly configService: ConfigService,
     ) { }
 
     async createRideRequest(requestData: any): Promise<RideRequest> {
@@ -41,6 +43,9 @@ export class RideRequestService {
             throw new UnprocessableEntityException('Selected driver is not available');
         }
 
+        // Get frontend base URL from environment
+        const frontendBaseUrl = this.configService.get<string>('FRONTEND_BASE_URL') || 'http://localhost:3000';
+
         // Create ride request with unique identifier
         const rideRequest = this.rideRequestRepository.create({
             identifier: ulid(),
@@ -59,7 +64,7 @@ export class RideRequestService {
         await this.emailService.sendRideRequestNotification(
             driver.email,
             driver.firstName,
-            '/driver-dashboard/rides'
+            `${frontendBaseUrl}/driver-dashboard/rides`
         );
 
         // Save in-app notification for the driver
@@ -67,7 +72,7 @@ export class RideRequestService {
             userIdentifier: driver.identifier,
             type: 'ride-request',
             message: `You have a new ride request from ${user.firstName} ${user.lastName}.`,
-            link: '/driver-dashboard/rides',
+            link: `${frontendBaseUrl}/driver-dashboard/rides`,
         });
 
         // Handle case where save returns an array
@@ -106,6 +111,9 @@ export class RideRequestService {
             }
         );
 
+        // Get frontend base URL from environment
+        const frontendBaseUrl = this.configService.get<string>('FRONTEND_BASE_URL') || 'http://localhost:3000';
+
         // Update driver availability based on response
         if (status === 'accepted') {
             console.log(`🔍 Updating driver availability to false for driver: ${rideRequest.driverIdentifier}`);
@@ -116,7 +124,7 @@ export class RideRequestService {
                 userIdentifier: rideRequest.userIdentifier,
                 type: 'ride-accepted',
                 message: `Your ride request has been accepted by the driver.`,
-                link: '/user-dashboard/rides',
+                link: `${frontendBaseUrl}/user-dashboard/rides?tab=upcoming`,
             });
 
             // Notify user (email)
@@ -125,13 +133,13 @@ export class RideRequestService {
                 await this.emailService.sendRideRequestNotification(
                     user.email,
                     user.firstName,
-                    '/user-dashboard/rides'
+                    `${frontendBaseUrl}/user-dashboard/rides`
                 );
             }
         }
 
         const updatedRideRequest = await this.findByIdentifier(identifier);
-        console.log(`🔍 Final ride request status: ${updatedRideRequest.status}`);
+        console.log(` Final ride request status: ${updatedRideRequest.status}`);
 
         return updatedRideRequest;
     }
@@ -149,8 +157,19 @@ export class RideRequestService {
             take: limit
         });
 
+        // Fetch user details for each ride request
+        const dataWithUser = await Promise.all(
+            data.map(async (ride) => {
+                const user = await this.userService.findOneByIdentifier(ride.userIdentifier);
+                return {
+                    ...ride,
+                    user: user ? { firstName: user.firstName, lastName: user.lastName, email: user.email } : null,
+                };
+            })
+        );
+
         return {
-            data,
+            data: dataWithUser,
             total,
             page,
             limit,
