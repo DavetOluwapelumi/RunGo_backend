@@ -21,6 +21,9 @@ export class WalletTransaction {
     @Column({ nullable: true })
     description: string;
 
+    @Column({ type: 'varchar', default: 'success' })
+    status: 'success' | 'pending' | 'failed';
+
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 

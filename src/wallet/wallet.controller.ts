@@ -41,6 +41,11 @@ export class WalletController {
         };
     }
 
+    @Get('transactions')
+    async getTransactions(@Query('userIdentifier') userIdentifier: string) {
+        return this.walletService.getTransactionsForUser(userIdentifier);
+    }
+
     @HttpCode(HttpStatus.OK)
     @Post('paystack/webhook')
     async paystackWebhook(@Body() body: any) {

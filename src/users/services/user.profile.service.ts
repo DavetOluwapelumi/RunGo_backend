@@ -27,17 +27,9 @@ export class UserProfileService {
         }
 
         try {
-            // Get file extension from original name
-            const ext = require('path').extname(file.originalname);
-            const filenameWithExt = file.filename + ext;
-
-            // Rename the file to include extension
-            const newPath = file.path + ext;
-            require('fs').renameSync(file.path, newPath);
-
-            // Generate public URL
-            const imageUrl = `/uploads/profile-images/${filenameWithExt}`;
-            const imagePath = newPath;
+            // The file is already saved with the correct extension by the controller
+            const imageUrl = `/uploads/profile-images/${file.filename}`;
+            const imagePath = file.path;
 
             console.log('Generated paths:', { imageUrl, imagePath });
 

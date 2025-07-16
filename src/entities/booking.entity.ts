@@ -60,6 +60,21 @@ export default class Booking {
   })
   lastUpdatedAt: Date;
 
+  @Column({ type: 'float', nullable: false, default: 0 })
+  amountPaid: number;
+
+  @Column({ type: 'boolean', default: false })
+  userStartAcknowledged: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  driverStartAcknowledged: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  cancelledBy?: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  cancelledAt?: Date;
+
   // @ManyToOne(() => User, (user) => user.bookings, { onDelete: 'CASCADE' }) // Add the relationship
   // user: User;
 

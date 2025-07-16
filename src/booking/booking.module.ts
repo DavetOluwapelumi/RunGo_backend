@@ -17,10 +17,11 @@ import { ServicesModule } from '../services/services.module';
 import { Wallet } from '../entities/wallet.entity';
 import { WalletTransaction } from '../entities/walletTransaction.entity';
 import { Notification } from '../entities/notification.entity';
+import { NotificationController } from './controller/notification.controller';
 
 @Module({
   providers: [BookingService, RideRequestService],
-  controllers: [BookingController],
+  controllers: [BookingController, NotificationController],
   imports: [
     forwardRef(() => AdminModule),
     TypeOrmModule.forFeature([Booking, Payment, User, Car, RideRequest, Wallet, WalletTransaction, Notification]),

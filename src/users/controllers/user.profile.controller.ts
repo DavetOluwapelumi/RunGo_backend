@@ -4,6 +4,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserProfileService } from '../services/user.profile.service';
 import { WalletService } from '../../wallet/wallet.service';
+import { extname } from 'path';
+import { diskStorage } from 'multer';
 
 @Controller({ version: '1', path: 'user/profile' })
 export class UserProfileController {
@@ -25,25 +27,28 @@ export class UserProfileController {
     }
 
     @Post('upload-image')
-    @UseInterceptors(FileInterceptor('file'))
-    async uploadImage(@UploadedFile() file: Express.Multer.File, @Body('userId') userId: string) {
-        console.log('Controller received:', {
-            userId,
-            file: file?.filename,
-            fileSize: file?.size,
-            mimetype: file?.mimetype,
-            originalname: file?.originalname
-        });
-
-        try {
-            // In production, extract userId from JWT
-            const result = await this.profileService.uploadProfileImage(userId, file);
-            console.log('Upload successful:', result);
-            return result;
-        } catch (error) {
-            console.error('Controller error:', error);
-            throw error;
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: './uploads/profile-images',
+            filename: (req, file, cb) => {
+                const ext = extname(file.originalname);
+                const baseName = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                cb(null, baseName + ext);
+            },
+        }),
+    }))
+    async uploadProfileImage(@UploadedFile() file: Express.Multer.File, @Body('userId') userId: string) {
+        if (!file) {
+            throw new Error('No file uploaded');
         }
+        // Save the image path in the user's record
+        const result = await this.profileService.uploadProfileImage(userId, file);
+        return {
+            success: true,
+            data: {
+                imageUrl: result.imageUrl,
+            },
+        };
     }
 
     @Delete('image')
@@ -51,8 +56,12 @@ export class UserProfileController {
         return this.profileService.deleteProfileImage(userId);
     }
 
-    @Get()
+    @Post()
     async getProfile(@Body('userId') userId: string) {
-        return this.profileService.getProfile(userId);
+        const user = await this.profileService.getProfile(userId);
+        return {
+            success: true,
+            data: user,
+        };
     }
 }

@@ -160,6 +160,75 @@ export class BookingController {
     return { message: 'Trip ended successfully', booking };
   }
 
+  @Patch('start-ride/:identifier')
+  async acknowledgeStartRide(
+    @Param('identifier') identifier: string,
+    @Body('role') role: 'user' | 'driver'
+  ) {
+    try {
+      console.log('Start ride called with identifier:', identifier);
+      // Fetch booking
+      const booking = await this.bookingService.findBookingByIdentifier(identifier);
+      console.log('Booking found:', booking);
+      if (!booking) {
+        throw new NotFoundException('Booking not found');
+      }
+      // Update acknowledgement
+      if (role === 'user') {
+        booking.userStartAcknowledged = true;
+      } else if (role === 'driver') {
+        booking.driverStartAcknowledged = true;
+      } else {
+        throw new NotFoundException('Invalid role');
+      }
+      // If both have acknowledged, update status to 'started'
+      if (booking.userStartAcknowledged && booking.driverStartAcknowledged) {
+        booking.status = 'started';
+      }
+      const updatedBooking = await this.bookingService.updateBooking(identifier, booking);
+      return {
+        started: updatedBooking.userStartAcknowledged && updatedBooking.driverStartAcknowledged,
+        booking: updatedBooking,
+      };
+    } catch (error) {
+      console.error('Error in acknowledgeStartRide:', error);
+      return { error: (error as any).message || error.toString(), stack: (error as any).stack };
+    }
+  }
+
+  @Patch('cancel-ride/:rideIdentifier')
+  async cancelRide(
+    @Param('rideIdentifier') rideIdentifier: string,
+    @Body('role') role: 'user' | 'admin',
+    @Body('userIdentifier') userIdentifier: string
+  ) {
+    try {
+      const booking = await this.bookingService.findBookingByIdentifier(rideIdentifier);
+      if (!booking) {
+        throw new NotFoundException('Booking not found');
+      }
+      if (booking.status === 'cancelled') {
+        return { message: 'Ride already cancelled', booking };
+      }
+      if (booking.status === 'completed' || booking.status === 'ended' || booking.dropoffTime) {
+        return { message: 'Cannot cancel a completed ride', booking };
+      }
+      // Only the user who booked or an admin can cancel
+      if (role === 'user' && booking.userIdentifier !== userIdentifier) {
+        throw new NotFoundException('You are not authorized to cancel this ride');
+      }
+      booking.status = 'cancelled';
+      booking.lastUpdatedAt = new Date();
+      booking.cancelledBy = role;
+      booking.cancelledAt = new Date();
+      const updatedBooking = await this.bookingService.updateBooking(rideIdentifier, booking);
+      return { message: 'Ride cancelled successfully', booking: updatedBooking };
+    } catch (error) {
+      console.error('Error in cancelRide:', error);
+      return { error: (error as any).message || error.toString(), stack: (error as any).stack };
+    }
+  }
+
   // Get available drivers for selection
   @Get('available-drivers')
   async getAvailableDrivers() {
@@ -217,5 +286,44 @@ export class BookingController {
       message: validation.message,
       ...validation
     };
+  }
+
+  @Get('user-upcoming-rides/:userIdentifier')
+  async getUserUpcomingRides(@Param('userIdentifier') userIdentifier: string) {
+    try {
+      // Fetch bookings with status 'accepted' (only valid status for upcoming rides)
+      const upcomingStatuses = ['accepted', 'started'];
+      const bookings = await this.bookingService.findUpcomingBookingsForUser(userIdentifier, upcomingStatuses);
+      // Exclude cancelled rides
+      const filteredBookings = bookings.filter(b => b.status !== 'cancelled');
+      // For each booking, fetch driver details
+      const ridesWithDriver = await Promise.all(
+        filteredBookings.map(async (booking) => {
+          const driver = await this.driverService.findOneByIdentifier(booking.driverIdentifier);
+          return {
+            ...booking,
+            price: booking.amountPaid, // Add price field for frontend
+            driver: driver
+              ? {
+                firstName: driver.firstName,
+                lastName: driver.lastName,
+                phoneNumber: driver.phoneNumber,
+                identifier: driver.identifier,
+              }
+              : null,
+          };
+        })
+      );
+      return { rides: ridesWithDriver };
+    } catch (error) {
+      console.error('Error in getUserUpcomingRides:', error);
+      return { error: (error as any).message || error.toString(), stack: (error as any).stack };
+    }
+  }
+
+  @Get('driver-bookings/:driverIdentifier')
+  async getDriverBookings(@Param('driverIdentifier') driverIdentifier: string) {
+    const bookings = await this.bookingService.findBookingsByDriver(driverIdentifier);
+    return { bookings };
   }
 }

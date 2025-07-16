@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Booking from '../../entities/booking.entity';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { CreateBookingDTO } from '../dto/createBooking';
 import { PaymentService } from '../../payment/payment.service';
 import { CreatePaymentDTO } from '../../payment/dto/createPayment';
@@ -113,6 +113,7 @@ export class BookingService {
         carIdentifier,
         paymentIdentifier,
         pickupTime: new Date(),
+        amountPaid,
       });
       const savedBooking = await this.bookingRepository.save(booking);
 
@@ -149,6 +150,7 @@ export class BookingService {
       paymentIdentifier: paymentResponse.data.reference,
       pickupTime: new Date(),
       status: 'accepted',
+      amountPaid: rideRequest.estimatedAmount,
     });
 
     return await this.bookingRepository.save(booking);
@@ -214,10 +216,58 @@ export class BookingService {
 
     const actionText = action === 'accept' ? 'accepted' : 'rejected';
 
+    let booking = null;
+    if (action === 'accept') {
+      // Automate wallet deduction and booking creation
+      // 1. Validate wallet and deduct fee
+      // 2. Create booking with status 'accepted'
+      const userIdentifier = rideRequest.userIdentifier;
+      const driverIdentifier = rideRequest.driverIdentifier;
+      const amountPaid = rideRequest.estimatedAmount;
+      const paymentReferenceNumber = `WALLET-${Date.now()}-${requestId}`;
+      const paymentMethod = 'Wallet';
+      const pickupLocation = rideRequest.pickupLocation;
+      const destination = rideRequest.destination;
+
+      // Debug log for amountPaid
+      console.log('DEBUG: Creating booking with amountPaid:', amountPaid, 'from rideRequest:', rideRequest);
+
+      // Validate wallet and deduct
+      const walletValidation = await this.validateWalletBalance(userIdentifier, amountPaid);
+      if (!walletValidation.canProceed) {
+        throw new UnprocessableEntityException(walletValidation.message);
+      }
+      await this.debitWallet(
+        userIdentifier,
+        amountPaid,
+        paymentReferenceNumber,
+        `Ride booking from ${pickupLocation} to ${destination}`
+      );
+
+      // Get driver to fetch carIdentifier
+      const driver = await this.driverService.findOneByIdentifier(driverIdentifier);
+      const carIdentifier = driver ? driver.carIdentifier : '';
+
+      // Create booking
+      booking = this.bookingRepository.create({
+        destination,
+        pickupLocation,
+        userIdentifier,
+        driverIdentifier,
+        carIdentifier,
+        paymentIdentifier: paymentReferenceNumber,
+        pickupTime: new Date(),
+        status: 'accepted',
+        amountPaid,
+      });
+      booking = await this.bookingRepository.save(booking);
+    }
+
     return {
       message: `Ride request ${actionText} successfully`,
       rideRequest,
-      status: rideRequest.status
+      status: rideRequest.status,
+      booking,
     };
   }
 
@@ -280,5 +330,19 @@ export class BookingService {
         : `Insufficient wallet balance. Current balance: ${wallet.balance}, Required: ${rideFare}. Please add ${rideFare - wallet.balance} to your wallet.`,
       canProceed: hasSufficientFunds
     };
+  }
+
+  async findUpcomingBookingsForUser(userIdentifier: string, statuses: string[]) {
+    return await this.bookingRepository.find({
+      where: {
+        userIdentifier,
+        status: statuses.length === 1 ? statuses[0] : In(statuses),
+      },
+      order: { pickupTime: 'ASC' },
+    });
+  }
+
+  async findBookingsByDriver(driverIdentifier: string) {
+    return await this.bookingRepository.find({ where: { driverIdentifier } });
   }
 }

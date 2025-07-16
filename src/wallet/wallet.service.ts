@@ -80,6 +80,7 @@ export class WalletService {
             type: 'credit',
             reference,
             description,
+            status: 'success',
         });
         await this.walletTransactionRepository.save(transaction);
         return wallet;
@@ -97,6 +98,7 @@ export class WalletService {
             type: 'debit',
             reference,
             description,
+            status: 'success',
         });
         await this.walletTransactionRepository.save(transaction);
         return wallet;
@@ -104,5 +106,29 @@ export class WalletService {
 
     async getWallet(userIdentifier: string) {
         return this.walletRepository.findOne({ where: { userIdentifier } });
+    }
+
+    async getTransactionsForUser(userIdentifierOrEmail: string) {
+        let userIdentifier = userIdentifierOrEmail;
+        if (userIdentifierOrEmail.includes('@')) {
+            // Treat as email
+            const user = await this.usersService.findOneByEmail(userIdentifierOrEmail);
+            if (!user) return [];
+            userIdentifier = user.identifier;
+        }
+        const wallet = await this.walletRepository.findOne({ where: { userIdentifier } });
+        if (!wallet) return [];
+        const transactions = await this.walletTransactionRepository.find({
+            where: { wallet: { id: wallet.id } },
+            order: { createdAt: 'DESC' },
+        });
+        return transactions.map(txn => ({
+            id: txn.id,
+            amount: txn.type === 'credit' ? txn.amount : -txn.amount,
+            type: txn.type,
+            description: txn.description,
+            createdAt: txn.createdAt,
+            status: txn.status || 'success',
+        }));
     }
 } 

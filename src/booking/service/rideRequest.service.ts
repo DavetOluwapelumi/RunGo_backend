@@ -75,6 +75,14 @@ export class RideRequestService {
             link: `${frontendBaseUrl}/driver-dashboard/rides`,
         });
 
+        // Save in-app notification for the user
+        await this.notificationRepository.save({
+            userIdentifier: user.identifier,
+            type: 'ride-request-sent',
+            message: `A ride request has been successfully sent to ${driver.firstName}.`,
+            link: `${frontendBaseUrl}/user-dashboard/rides`,
+        });
+
         // Handle case where save returns an array
         if (Array.isArray(savedRequest)) {
             return savedRequest[0];
@@ -137,6 +145,18 @@ export class RideRequestService {
                 );
             }
         }
+        // Add notification for rejected ride request
+        if (status === 'rejected') {
+            // Get driver details for name
+            const driver = await this.driverService.findOneByIdentifier(rideRequest.driverIdentifier);
+            const driverName = driver ? `${driver.firstName} ${driver.lastName}` : 'the driver';
+            await this.notificationRepository.save({
+                userIdentifier: rideRequest.userIdentifier,
+                type: 'ride-rejected',
+                message: `Unfortunately, ${driverName} was unable to accept your ride request. Please try requesting another ride or choose a different driver.`,
+                link: `${frontendBaseUrl}/user-dashboard/rides?tab=rejected`,
+            });
+        }
 
         const updatedRideRequest = await this.findByIdentifier(identifier);
         console.log(` Final ride request status: ${updatedRideRequest.status}`);
@@ -148,14 +168,16 @@ export class RideRequestService {
         const skip = (page - 1) * limit;
 
         const [data, total] = await this.rideRequestRepository.findAndCount({
-            where: {
-                driverIdentifier,
-                status: 'pending'
-            },
+            where: [
+                { driverIdentifier, status: 'pending' },
+                { driverIdentifier, status: 'accepted' }
+            ],
             order: { createdAt: 'ASC' },
             skip,
             take: limit
         });
+
+        console.log('🔍 Pending requests for driver:', driverIdentifier, data);
 
         // Fetch user details for each ride request
         const dataWithUser = await Promise.all(
