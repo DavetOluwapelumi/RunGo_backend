@@ -69,6 +69,12 @@ export default class Booking {
   @Column({ type: 'boolean', default: false })
   driverStartAcknowledged: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  userCompleteAcknowledged: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  driverCompleteAcknowledged: boolean;
+
   @Column({ type: 'varchar', nullable: true })
   cancelledBy?: string;
 

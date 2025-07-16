@@ -229,6 +229,43 @@ export class BookingController {
     }
   }
 
+  @Patch('complete-ride/:identifier')
+  async acknowledgeCompleteRide(
+    @Param('identifier') identifier: string,
+    @Body('role') role: 'user' | 'driver'
+  ) {
+    try {
+      // Fetch booking
+      const booking = await this.bookingService.findBookingByIdentifier(identifier);
+      if (!booking) {
+        throw new NotFoundException('Booking not found');
+      }
+      // Update completion acknowledgement
+      if (role === 'user') {
+        booking.userCompleteAcknowledged = true;
+      } else if (role === 'driver') {
+        booking.driverCompleteAcknowledged = true;
+      } else {
+        throw new NotFoundException('Invalid role');
+      }
+      // If both have acknowledged, update status to 'completed' and set dropoffTime
+      if (booking.userCompleteAcknowledged && booking.driverCompleteAcknowledged) {
+        booking.status = 'completed';
+        booking.dropoffTime = new Date();
+        // Set driver availability to true
+        await this.driverService.updateDriverAvailability(booking.driverIdentifier, true);
+      }
+      const updatedBooking = await this.bookingService.updateBooking(identifier, booking);
+      return {
+        completed: updatedBooking.userCompleteAcknowledged && updatedBooking.driverCompleteAcknowledged,
+        booking: updatedBooking,
+      };
+    } catch (error) {
+      console.error('Error in acknowledgeCompleteRide:', error);
+      return { error: (error as any).message || error.toString(), stack: (error as any).stack };
+    }
+  }
+
   // Get available drivers for selection
   @Get('available-drivers')
   async getAvailableDrivers() {
